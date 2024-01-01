@@ -9,27 +9,23 @@
 // 	Fisierul care face legatura intre program si shadere;
 #include "glm/glm.hpp"        //	Bibloteci utilizate pentru transformari grafice;
 #include "glm/gtc/matrix_transform.hpp"
-#include "SOIL.h"
 
 #include "Camera/camera.h"
-
-
+#include "Skybox/skybox.h"
 
 //	Numarul de multiplicari 
-#define INSTANCE_COUNT 40
+#define INSTANCE_COUNT 10
 
 //  Identificatorii obiectelor de tip OpenGL; 
 GLuint
         VboId,
         VaoId,
-        VbPos,
         VbCol,
         VbModelMat,
-        EboId,
-        ColorBufferId,
-        ProgramId,
-        viewLocation,
+        EboId;
+GLint   viewLocation,
         projLocation,
+        ProgramId,
         codColLocation;
 GLint winWidth = 1200, winHeight = 900;
 //	Variabile catre matricile de transformare;
@@ -40,9 +36,10 @@ GLint codCol;
 float const PI = 3.141592;
 bool keys[256];
 //	Elemente pentru matricea de proiectie;
-float width = 800, height = 600, zNear = 1.f, fov = 90.f * PI / 180;
+float width = 800, height = 600, zNear = 0.3f, fov = 90.f * PI / 180;
 float gametime = 0, delta_t = 0, last_time = 0;
 Camera camera;
+Skybox sky;
 
 void ProcessNormalKeysUp(unsigned char key, int x, int y) {
     keys[key] = false;
@@ -98,12 +95,12 @@ void ProcessNormalKeys(unsigned char key, int x, int y) {
     }
 }
 
-float centerX = winWidth / 2, centerY = winHeight / 2;
+int centerX = winWidth / 2, centerY = winHeight / 2;
 
 void UseMouse(int x, int y) {
 
-    float xoffset = (float) x - centerX;
-    float yoffset = centerY - (float) y;
+    float xoffset = (float) x - (float)centerX;
+    float yoffset = (float)centerY - (float) y;
 
     camera.ProcessMouseMovement(xoffset, yoffset);
 
@@ -119,7 +116,7 @@ void UseMouse(int x, int y) {
 //  Shaderul de fragment / Fragment shader - afecteaza culoarea pixelilor;
 void CreateShaders() {
     ProgramId = LoadShaders("shaders/example.vert", "shaders/example.frag");
-    glUseProgram(ProgramId);
+    sky.CreateSkyShader();
 }
 
 //  Se initializeaza un vertex Buffer Object (VBO) pentru tranferul datelor spre memoria placii grafice (spre shadere);
@@ -224,6 +221,7 @@ void CreateVBO() {
 // Elimina obiectele de tip shader dupa rulare;
 void DestroyShaders() {
     glDeleteProgram(ProgramId);
+    glDeleteProgram(sky.SkyboxId);
 }
 
 void DestroyVBO() {
@@ -247,7 +245,9 @@ void DestroyVBO() {
 
 //  Functia de eliberare a resurselor alocate de program;
 void Cleanup() {
+    sky.DestroySkyShader();
     DestroyShaders();
+    sky.DestroySkyboxVBO();
     DestroyVBO();
 }
 
@@ -255,7 +255,12 @@ void Cleanup() {
 void Initialize() {
     glClearColor(1.f, 1.0f, 1.0f, 0.0f);        //  Culoarea de fond a ecranului;
     CreateVBO();                                //  Trecerea datelor de randare spre bufferul folosit de shadere;
+    sky.CreateSkyboxVBO();
     CreateShaders();                            //  Initilizarea shaderelor;
+
+    sky.SkyInit();
+
+    glUseProgram(ProgramId);
     //	Instantierea variabilelor uniforme pentru a "comunica" cu shaderele;
     viewLocation = glGetUniformLocation(ProgramId, "view");
     projLocation = glGetUniformLocation(ProgramId, "projection");
@@ -276,6 +281,8 @@ void RenderFunction() {
     glEnable(GL_DEPTH_TEST);
 
     UpdateTime();
+
+    glUseProgram(ProgramId);
     glBindVertexArray(VaoId);
     glBindBuffer(GL_ARRAY_BUFFER, VboId);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EboId);
@@ -306,6 +313,12 @@ void RenderFunction() {
     glUniform1i(codColLocation, codCol);
     glLineWidth(3.5);
     glDrawElementsInstanced(GL_LINE_LOOP, 11, GL_UNSIGNED_BYTE, (void *) (13), INSTANCE_COUNT);
+
+    //Desenare SKYBOX
+    // Matricea de vizualizare si proiectie;
+    view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
+    projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
+    sky.SkyRender(view, projection,gametime);
 
     glutSwapBuffers();    //	Inlocuieste imaginea deseneata in fereastra cu cea randata;
     glFlush();            //  Asigura rularea tuturor comenzilor OpenGL apelate anterior;
