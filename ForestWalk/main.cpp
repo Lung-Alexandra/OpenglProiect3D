@@ -12,6 +12,7 @@
 
 #include "Camera/camera.h"
 #include "Skybox/skybox.h"
+#include "Terrain/terrain.h"
 
 //	Numarul de multiplicari 
 #define INSTANCE_COUNT 10
@@ -29,7 +30,7 @@ GLint   viewLocation,
         codColLocation;
 GLint winWidth = 1200, winHeight = 900;
 //	Variabile catre matricile de transformare;
-glm::mat4 view, projection;
+glm::mat4 view, projection, model;
 //	Variabila ce determina schimbarea culorii pixelilor in shader;
 GLint codCol;
 //	Valaorea lui pi;
@@ -38,8 +39,10 @@ bool keys[256];
 //	Elemente pentru matricea de proiectie;
 float width = 800, height = 600, zNear = 0.3f, fov = 90.f * PI / 180;
 float gametime = 0, delta_t = 0, last_time = 0;
+float terrain_width = 1023, terrain_depth = 1023;
 Camera camera;
 Skybox sky;
+Terrain terrain;
 
 void ProcessNormalKeysUp(unsigned char key, int x, int y) {
     keys[key] = false;
@@ -117,6 +120,7 @@ void UseMouse(int x, int y) {
 void CreateShaders() {
     ProgramId = LoadShaders("shaders/example.vert", "shaders/example.frag");
     sky.CreateSkyShader();
+    terrain.CreateTerrainShader();
 }
 
 //  Se initializeaza un vertex Buffer Object (VBO) pentru tranferul datelor spre memoria placii grafice (spre shadere);
@@ -222,6 +226,7 @@ void CreateVBO() {
 void DestroyShaders() {
     glDeleteProgram(ProgramId);
     glDeleteProgram(sky.SkyboxId);
+    glDeleteProgram(terrain.TerrainId);
 }
 
 void DestroyVBO() {
@@ -246,8 +251,10 @@ void DestroyVBO() {
 //  Functia de eliberare a resurselor alocate de program;
 void Cleanup() {
     sky.DestroySkyShader();
+    terrain.DestroyTerrainShader();
     DestroyShaders();
     sky.DestroySkyboxVBO();
+    terrain.DestroyTerrainVBO();
     DestroyVBO();
 }
 
@@ -256,9 +263,15 @@ void Initialize() {
     glClearColor(1.f, 1.0f, 1.0f, 0.0f);        //  Culoarea de fond a ecranului;
     CreateVBO();                                //  Trecerea datelor de randare spre bufferul folosit de shadere;
     sky.CreateSkyboxVBO();
+
+    terrain.set_world_scale(10.0f);
+    terrain.CreateTerrainVBO(terrain_width, terrain_depth);
     CreateShaders();                            //  Initilizarea shaderelor;
 
     sky.SkyInit();
+    terrain.TerrainInit();
+
+    camera.setAltitude(terrain.get_world_scale() * terrain.get_altitude_factor() / 2);
 
     glUseProgram(ProgramId);
     //	Instantierea variabilelor uniforme pentru a "comunica" cu shaderele;
@@ -281,6 +294,12 @@ void RenderFunction() {
     glEnable(GL_DEPTH_TEST);
 
     UpdateTime();
+
+    // Desenare TERRAIN
+    view = camera.GetViewMatrix();
+    projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
+    model = glm::mat4(1.0f);
+    terrain.TerrainRender(view, projection, model);
 
     glUseProgram(ProgramId);
     glBindVertexArray(VaoId);
@@ -314,7 +333,7 @@ void RenderFunction() {
     glLineWidth(3.5);
     glDrawElementsInstanced(GL_LINE_LOOP, 11, GL_UNSIGNED_BYTE, (void *) (13), INSTANCE_COUNT);
 
-    //Desenare SKYBOX
+    // Desenare SKYBOX
     // Matricea de vizualizare si proiectie;
     view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
     projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
@@ -334,7 +353,7 @@ int main(int argc, char *argv[]) {
     glutInitWindowSize(winWidth, winHeight);                        //  Dimensiunea ferestrei;
     glutInitWindowPosition(100, 100);                                //  Pozitia initiala a ferestrei;
     glutCreateWindow(
-            "Instanced rendering - OpenGL <<nou>>");        //	Creeaza fereastra de vizualizare, indicand numele acesteia;
+            "Forest Walk - OpenGL project");        //	Creeaza fereastra de vizualizare, indicand numele acesteia;
 
     //	Se initializeaza GLEW si se verifica suportul de extensii OpenGL modern disponibile pe sistemul gazda;
     //  Trebuie initializat inainte de desenare;

@@ -47,7 +47,7 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime) {
     if (direction == RIGHT)
         Position += Right * velocity;
     // make sure the user stays at the ground level
-    Position.y = 0.0f; // keeps the user at the ground level (xz plane)
+    Position.y = Altitude; // keeps the user at the ground level (xz plane)
 }
 
 // processes input received from a mouse input system.
