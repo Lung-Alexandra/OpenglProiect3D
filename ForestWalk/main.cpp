@@ -264,8 +264,9 @@ void Initialize() {
     CreateVBO();                                //  Trecerea datelor de randare spre bufferul folosit de shadere;
     sky.CreateSkyboxVBO();
 
-    terrain.set_world_scale(10.0f);
+    terrain.set_world_scale(15.0f);
     terrain.CreateTerrainVBO(terrain_width, terrain_depth);
+    terrain.set_light_pos(glm::vec3(terrain.t_width / 2, terrain.get_max_altitude() * 2, terrain.t_depth / 2));
     CreateShaders();                            //  Initilizarea shaderelor;
 
     sky.SkyInit();
@@ -315,9 +316,9 @@ void RenderFunction() {
     glUniformMatrix4fv(projLocation, 1, GL_FALSE, &projection[0][0]);
 
     //	Desenarea fetelor;
-    codCol = 0;                                                            //  Culoarea;
+    // codCol = 0;                                                            //  Culoarea;
     //	Transmiterea variabilei uniforme pentru COLORARE spre shadere;
-    glUniform1i(codColLocation, codCol);
+    // glUniform1i(codColLocation, codCol);
     //	Functia glDrawElementsInstanced primeste 4 argumente:
     //	 - arg1 = modul de desenare;
     //	 - arg2 = numarul de varfuri;
@@ -325,13 +326,13 @@ void RenderFunction() {
     //	 - arg4 = pointer spre indici (EBO): pozitia de start a indicilor;
     //	 - arg5 = numarul de instante;
 
-    glDrawElementsInstanced(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_BYTE, (void *) (0), INSTANCE_COUNT);
-    glDrawElementsInstanced(GL_TRIANGLE_STRIP, 9, GL_UNSIGNED_BYTE, (void *) (4), INSTANCE_COUNT);
+    // glDrawElementsInstanced(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_BYTE, (void *) (0), INSTANCE_COUNT);
+    // glDrawElementsInstanced(GL_TRIANGLE_STRIP, 9, GL_UNSIGNED_BYTE, (void *) (4), INSTANCE_COUNT);
     //  Desenarea muchiilor;
-    codCol = 1;                                         //	Se schimba culoarea;
-    glUniform1i(codColLocation, codCol);
-    glLineWidth(3.5);
-    glDrawElementsInstanced(GL_LINE_LOOP, 11, GL_UNSIGNED_BYTE, (void *) (13), INSTANCE_COUNT);
+    // codCol = 1;                                         //	Se schimba culoarea;
+    // glUniform1i(codColLocation, codCol);
+    // glLineWidth(3.5);
+    // glDrawElementsInstanced(GL_LINE_LOOP, 11, GL_UNSIGNED_BYTE, (void *) (13), INSTANCE_COUNT);
 
     // Desenare SKYBOX
     // Matricea de vizualizare si proiectie;
