@@ -114,6 +114,9 @@
     <ClCompile Include="Terrain\terrain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Ruins\Ruins.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SOIL.h">
@@ -1016,6 +1019,9 @@
     <ClInclude Include="Terrain\terrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Ruins\Ruins.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="include\glm\CMakeLists.txt">
@@ -1504,5 +1510,7 @@
     <None Include="textures\skybox\bottom.jpg" />
     <None Include="shaders\terrain.frag" />
     <None Include="shaders\terrain.vert" />
+    <None Include="shaders\Ruins.vert" />
+    <None Include="shaders\Ruins.frag" />
   </ItemGroup>
 </Project>
