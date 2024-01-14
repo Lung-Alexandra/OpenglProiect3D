@@ -26,28 +26,53 @@ glm::mat4 Camera::GetViewMatrix() {
     return glm::lookAt(Position, Position + Front, Up);
 }
 
+void Camera::increaseSpeed() {
+    MovementSpeed += 0.5;
+}
+
+void Camera::decreaseSpeed() {
+    if (MovementSpeed >= 0.5)
+        MovementSpeed -= 0.5;
+}
+
 // processes input received from any keyboard-like input system.
 // Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
 void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime) {
+    glm::vec3 front = Front;
+    front.y = 0;
+    front = glm::normalize(front);
+    glm::vec3 up = glm::vec3(0, 1, 0);
     float velocity = MovementSpeed * deltaTime;
-    if (direction == FORWARD)
-        Position += Front * velocity;
-    if (direction == RFORWARD)
-        Position += (Front + Right) * velocity;
-    if (direction == LFORWARD)
-        Position += (Front - Right) * velocity;
-    if (direction == BACKWARD)
-        Position -= Front * velocity;
-    if (direction == RBACKWARD)
-        Position -= (Front - Right) * velocity;
-    if (direction == LBACKWARD)
-        Position -= (Front + Right) * velocity;
-    if (direction == LEFT)
+    if (direction == FORWARD) {
+        Position += front * velocity;
+    }
+    if (direction == RFORWARD) {
+        Position += glm::normalize(front + Right) * velocity;
+    }
+    if (direction == LFORWARD) {
+        Position += glm::normalize(front - Right) * velocity;
+    }
+    if (direction == BACKWARD) {
+        Position -= front * velocity;
+    }
+    if (direction == RBACKWARD) {
+        Position -= glm::normalize(front - Right) * velocity;
+    }
+    if (direction == LBACKWARD) {
+        Position -= glm::normalize(front + Right) * velocity;
+    }
+    if (direction == LEFT) {
         Position -= Right * velocity;
-    if (direction == RIGHT)
+    }
+    if (direction == RIGHT) {
         Position += Right * velocity;
-    // make sure the user stays at the ground level
-    Position.y = Altitude; // keeps the user at the ground level (xz plane)
+    }
+    if (direction == UP) {
+        Position += up * velocity;
+    }
+    if (direction == DOWN) {
+        Position -= up * velocity;
+    }
 }
 
 // processes input received from a mouse input system.

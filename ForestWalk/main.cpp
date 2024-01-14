@@ -35,7 +35,7 @@ glm::mat4 view, projection, model;
 GLint codCol;
 //	Valaorea lui pi;
 float const PI = 3.141592;
-bool keys[256];
+bool keys[256]; // 100->    GLUT_KEY_LEFT, 101-> GLUT_KEY_RIGHT, 102->GLUT_KEY_UP, 103->GLUT_KEY_DOWN
 //	Elemente pentru matricea de proiectie;
 float width = 800, height = 600, zNear = 0.3f, fov = 90.f * PI / 180;
 float gametime = 0, delta_t = 0, last_time = 0;
@@ -45,6 +45,9 @@ Skybox sky;
 Terrain terrain;
 
 void ProcessNormalKeysUp(unsigned char key, int x, int y) {
+    keys[key] = false;
+}
+void ProcessSpecialKeysUp(int key, int xx, int yy) {
     keys[key] = false;
 }
 
@@ -90,6 +93,20 @@ void ProcessNormalKeys(unsigned char key, int x, int y) {
             camera.ProcessKeyboard(RIGHT, gametime);
         }
     }
+    // coborare
+    if(keys['q']){
+        camera.ProcessKeyboard(UP, gametime);
+    }
+    // urcare
+    if(keys['e']){
+        camera.ProcessKeyboard(DOWN, gametime);
+    }
+    if(key == '+'){
+        camera.increaseSpeed();
+    }
+    if(key == '-'){
+        camera.decreaseSpeed();
+    }
     if (key == 27) {
         glutLeaveMainLoop();
     }
@@ -97,6 +114,50 @@ void ProcessNormalKeys(unsigned char key, int x, int y) {
         glutFullScreen();
     }
 }
+
+void ProcessSpecialKeys(int key, int xx, int yy)
+{
+    // 100-> GLUT_KEY_LEFT, 101-> GLUT_KEY_RIGHT, 102->GLUT_KEY_UP, 103->GLUT_KEY_DOWN
+    ProcessNormalKeysDown(key, xx, yy);
+    if (keys[GLUT_KEY_UP]) {
+        if (keys[GLUT_KEY_RIGHT]) {
+            camera.ProcessKeyboard(RFORWARD, gametime);
+        } else if (keys[GLUT_KEY_LEFT]) {
+            camera.ProcessKeyboard(LFORWARD, gametime);
+        } else {
+            camera.ProcessKeyboard(FORWARD, gametime);
+        }
+    }
+    if (keys[GLUT_KEY_DOWN]) {
+        if (keys[GLUT_KEY_RIGHT]) {
+            camera.ProcessKeyboard(RBACKWARD, gametime);
+        } else if (keys[GLUT_KEY_LEFT]) {
+            camera.ProcessKeyboard(LBACKWARD, gametime);
+        } else {
+            camera.ProcessKeyboard(BACKWARD, gametime);
+        }
+    }
+    if (keys[GLUT_KEY_LEFT]) {
+        if (keys[GLUT_KEY_UP]) {
+            camera.ProcessKeyboard(LFORWARD, gametime);
+        } else if (keys[GLUT_KEY_DOWN]) {
+            camera.ProcessKeyboard(LBACKWARD, gametime);
+        } else {
+            camera.ProcessKeyboard(LEFT, gametime);
+        }
+    }
+    if (keys[GLUT_KEY_RIGHT]) {
+        if (keys[GLUT_KEY_UP]) {
+            camera.ProcessKeyboard(RFORWARD, gametime);
+        } else if (keys[GLUT_KEY_DOWN]) {
+            camera.ProcessKeyboard(RBACKWARD, gametime);
+        } else {
+            camera.ProcessKeyboard(RIGHT, gametime);
+        }
+    }
+
+}
+
 
 int centerX = winWidth / 2, centerY = winHeight / 2;
 
@@ -367,7 +428,8 @@ int main(int argc, char *argv[]) {
     glutPassiveMotionFunc(UseMouse);
     glutKeyboardUpFunc(ProcessNormalKeysUp);
     glutKeyboardFunc(ProcessNormalKeys);    //	Functii ce proceseaza inputul de la tastatura utilizatorului;
-    //glutSpecialFunc(ProcessSpecialKeys);
+    glutSpecialUpFunc(ProcessSpecialKeysUp);
+    glutSpecialFunc(ProcessSpecialKeys);
     glutCloseFunc(Cleanup);                    //  Eliberarea resurselor alocate de program;
     //  Bucla principala de procesare a evenimentelor GLUT (functiile care incep cu glut: glutInit etc.) este pornita;
     //  Prelucreaza evenimentele si deseneaza fereastra OpenGL pana cand utilizatorul o inchide;
