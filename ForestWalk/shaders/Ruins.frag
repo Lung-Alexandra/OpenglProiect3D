@@ -2,7 +2,7 @@
 #version 330
 
 //	Variabile de intrare (dinspre Shader.vert);
-in vec3 ex_Color;
+in vec2 TexCoord;
 
 //	Variabile de iesire	(spre programul principal);
 out vec3 out_Color;
@@ -10,14 +10,15 @@ out vec3 out_Color;
 //  Variabile uniforme;
 uniform int codCol;
 
+const int numTextures = 1;
+uniform sampler2D ruinsTextures[numTextures];
+
+
 void main(void)
 {
-  switch (codCol)
-  {
-    case 1:
-    out_Color=vec3(0.0, 0.0, 0.0);
-    break;
-    default:
-    out_Color=ex_Color;
-  }
+  vec4 texColor;
+  texColor = texture(ruinsTextures[0], TexCoord);
+
+  out_Color=texColor.rgb;
+  
 }

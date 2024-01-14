@@ -1,8 +1,11 @@
 #include "Ruins.h"
+#include "SOIL.h"
+#include <string>
+
 
 
 void Ruins::CreateRuinsShader() {
-    RuinsId = LoadShaders("shaders/example.vert", "shaders/example.frag");
+    RuinsId = LoadShaders("shaders/Ruins.vert", "shaders/Ruins.frag");
 
 }
 void Ruins::ruinsInit() {
@@ -11,6 +14,53 @@ void Ruins::ruinsInit() {
     viewLocation = glGetUniformLocation(RuinsId, "view");
     projLocation = glGetUniformLocation(RuinsId, "projection");
     codColLocation = glGetUniformLocation(RuinsId, "codCol");
+
+    cntLoadedTextures = LoadTextures(textureIDs, textures);
+}
+
+unsigned int Ruins::LoadTextures(std::vector<GLuint>& textureIDs, const std::vector<std::string>& textures) {
+    glGenTextures(textures.size(), textureIDs.data());
+
+    for (GLuint i = 0; i < textures.size(); i++) {
+        glBindTexture(GL_TEXTURE_2D, textureIDs[i]);
+
+        int width, height, nrChannels;
+        unsigned char* image = SOIL_load_image(textures[i].c_str(), &width, &height, &nrChannels, SOIL_LOAD_RGB);
+        std::cout << width << ' ' << height << std::endl;
+
+        if (image) {
+            glTexImage2D(
+                GL_TEXTURE_2D,
+                0,
+                GL_RGB,
+                width, height, 0,
+                GL_RGB,
+                GL_UNSIGNED_BYTE,
+                image
+            );
+            SOIL_free_image_data(image);
+        }
+        else {
+            std::cerr << "Error loading texture: " << textures[i] << std::endl;
+        }
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+
+        // Set texture wrapping options
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+        // Set texture filtering options
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+        // Generate mipmaps
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    return textureIDs.size();
 }
 
 static float randomRange(float min, float max) {
@@ -96,18 +146,22 @@ void Ruins::CreateRuinsVBO()
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
 
-    //  Se creeaza un buffer pentru CULORI;
-    glGenBuffers(1, &VbCol);
-    glBindBuffer(GL_ARRAY_BUFFER, VbCol);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Colors), Colors, GL_STATIC_DRAW);
-    //	Se activeaza lucrul cu atribute;
-    //  Se asociaza atributul (1 = culoare) pentru shader;
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (GLvoid*)0);
-    //	Rata cu care are loc distribuirea culorilor per instanta;
-    glVertexAttribDivisor(1, 1);
 
-    //  Se creeaza un buffer pentru MATRICEA DE POZITIE (instantierea cuburilor);
+    GLfloat TexCoords[] = { 0.0, 0.0, 2.0, 0.0, 2.0, 5.0, 0.0, 5.0, 
+    0.0, 0.0, 2.0, 0.0, 2.0, 5.0, 0.0, 5.0, 
+    0.0, 0.0, 2.0, 0.0, 2.0, 5.0, 0.0, 5.0, 
+    0.0, 0.0, 2.0, 0.0, 2.0, 5.0, 0.0, 5.0
+    };
+
+    // Generate and bind buffer for texture coordinates
+    GLuint VbTex;
+    glGenBuffers(1, &VbTex);
+    glBindBuffer(GL_ARRAY_BUFFER, VbTex);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(TexCoords), TexCoords, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0);
+
+
     glGenBuffers(1, &VbModelMat);
     glBindBuffer(GL_ARRAY_BUFFER, VbModelMat);
     glBufferData(GL_ARRAY_BUFFER, sizeof(MatModel), MatModel, GL_STATIC_DRAW);
@@ -121,6 +175,8 @@ void Ruins::CreateRuinsVBO()
             (void*)(sizeof(glm::vec4) * i));      //  Start offset;
         glVertexAttribDivisor(2 + i, 1);
     }
+
+    
 
     //	Se creeaza un buffer pentru INDICI;
     glGenBuffers(1, &EboId);
@@ -158,6 +214,12 @@ void Ruins::render(glm::mat4 view, glm::mat4 projection, glm::mat4 model, float 
 
     //	Realizarea proiectiei;
     glUniformMatrix4fv(projLocation, 1, GL_FALSE, &projection[0][0]);
+
+    for (GLuint i = 0; i < cntLoadedTextures; i++) {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, textureIDs[i]);
+        glUniform1i(glGetUniformLocation(RuinsId, ("ruinsTextures[" + std::to_string(i) + "]").c_str()), i);
+    }
 
     codCol = 0;
     glUniform1i(codColLocation, codCol);

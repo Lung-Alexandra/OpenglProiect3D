@@ -2,6 +2,7 @@
 
 // Libraries
 #include <iostream>
+#include <vector>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include "loadShaders.h"
@@ -15,6 +16,15 @@ private:
     GLuint VboId, VaoId, VbCol, VbModelMat, EboId;
     GLint viewLocation, projLocation, codColLocation;
     GLint codCol;
+    unsigned int cntLoadedTextures;
+
+    std::vector<GLuint> textureIDs = {0};
+
+    std::vector<std::string> textures = {
+            "textures/ruins/stone-granite-2-TEX.png",
+    };
+
+    unsigned int LoadTextures(std::vector<GLuint>& textureIDs, const std::vector<std::string>& textures);
 
 public:
     GLint RuinsId;
