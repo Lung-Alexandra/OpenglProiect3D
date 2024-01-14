@@ -61,11 +61,11 @@ public:
 	float GetMinAltitude() { return MIN_ALTITUDE; }
 	float GetMaxAltitude() { return MAX_ALTITUDE; }
 
-	glm::vec3 get_light_pos() { return lightPos; }
-	void set_light_pos(glm::vec3 pos) { lightPos = pos * WORLD_SCALE; }
+	glm::vec3 GetLightPos() { return lightPos; }
+	void SetLightPos(glm::vec3 pos) { lightPos = pos * WORLD_SCALE; }
 
-	float get_min_altitude() { return MIN_ALTITUDE; }
-	float get_max_altitude() { return MAX_ALTITUDE; }
+	float GetMinAltitude() { return MIN_ALTITUDE; }
+	float GetMaxAltitude() { return MAX_ALTITUDE; }
 
 private:
 	struct Vertex {
