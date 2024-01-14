@@ -13,7 +13,9 @@ enum Camera_Movement {
     FORWARD, RFORWARD,LFORWARD,
     BACKWARD, RBACKWARD, LBACKWARD,
     LEFT,
-    RIGHT
+    RIGHT,
+    UP,
+    DOWN
 };
 
 // Default camera values
@@ -49,6 +51,9 @@ public:
 
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix();
+    // modify the speed of movement
+    void increaseSpeed();
+    void decreaseSpeed();
 
     // processes input received from any keyboard-like input system.
     // Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
