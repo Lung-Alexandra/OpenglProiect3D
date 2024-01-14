@@ -2,7 +2,7 @@
 #include <vector>
 #include <iostream>
 
-float Terrain::get_y(int x, int z, unsigned char* heightmap, int h_width, int h_height, int h_nrChannels) {
+float Terrain::GetY(int x, int z, unsigned char* heightmap, int h_width, int h_height, int h_nrChannels) {
 	// Heightmap not available
 	if (!heightmap) {
 		return -2.0f;
@@ -61,7 +61,7 @@ void Terrain::CreateTerrainVBO(int width, int depth) {
 	for (int z = 0; z < t_depth; z++) {
 		for (int x = 0; x < t_width; x++) {
 			assert(idx < Vertices.size());
-			int y = get_y(x, z, h_image, h_width, h_height, h_nrChannels);
+			int y = GetY(x, z, h_image, h_width, h_height, h_nrChannels);
 			if (y > MAX_ALTITUDE) {
 				MAX_ALTITUDE = y;
 			}
@@ -224,7 +224,7 @@ void Terrain::TerrainInit() {
 	cntLoadedTextures = LoadTextures(textureIDs, textures);
 }
 
-void Terrain::TerrainRender(glm::mat4 view, glm::mat4 projection, glm::mat4 model) {
+void Terrain::TerrainRender(glm::mat4 view, glm::mat4 projection, glm::mat4 model, float time) {
 	glDepthFunc(GL_LEQUAL);
 	glUseProgram(TerrainId);
 
@@ -234,6 +234,7 @@ void Terrain::TerrainRender(glm::mat4 view, glm::mat4 projection, glm::mat4 mode
 
 	glBindVertexArray(VaoTerrain);
 
+	glUniform1f(glGetUniformLocation(TerrainId, "gametime"), time);
 	glUniform1f(glGetUniformLocation(TerrainId, "MIN_Y"), MIN_ALTITUDE * WORLD_SCALE);
 	glUniform1f(glGetUniformLocation(TerrainId, "MAX_Y"), MAX_ALTITUDE * WORLD_SCALE);
 	glUniform3fv(glGetUniformLocation(TerrainId, "LightPos"), 1, &lightPos[0]);

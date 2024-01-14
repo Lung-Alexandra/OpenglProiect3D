@@ -64,8 +64,11 @@ public:
     // Expects the offset value in both the x and y direction.
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true) ;
 
-    void setAltitude(float altitude) { Altitude = altitude; Position.y = altitude; }
-    float getAltitude() { return Altitude; }
+    void SetAltitude(float altitude) { Altitude = altitude; Position.y = altitude; }
+    float GetAltitude() { return Altitude; }
+
+    void SetPos(glm::vec3 pos) { Position = pos; }
+    glm::vec3 GetPos() { return Position; }
 
 private:
     // calculates the front vector from the Camera's (updated) Euler Angles

@@ -325,15 +325,20 @@ void Initialize() {
     CreateVBO();                                //  Trecerea datelor de randare spre bufferul folosit de shadere;
     sky.CreateSkyboxVBO();
 
-    terrain.set_world_scale(15.0f);
+    terrain.SetWorldScale(30.0f);
     terrain.CreateTerrainVBO(terrain_width, terrain_depth);
-    terrain.set_light_pos(glm::vec3(terrain.t_width / 2, terrain.get_max_altitude() * 2, terrain.t_depth / 2));
+    terrain.SetLightPos(glm::vec3(terrain_width / 2, 
+                                    terrain.GetMaxAltitude() * 2, 
+                                    terrain_depth / 2));
     CreateShaders();                            //  Initilizarea shaderelor;
 
     sky.SkyInit();
     terrain.TerrainInit();
 
-    camera.setAltitude(terrain.get_world_scale() * terrain.get_altitude_factor() / 2);
+    camera.SetPos(glm::vec3(terrain.GetWorldScale() * terrain_width / 2, 
+                            terrain.GetWorldScale() * terrain.GetMaxAltitude() / 2,
+                            terrain.GetWorldScale() * terrain_depth / 2));
+    camera.SetAltitude(terrain.GetWorldScale() * terrain.GetMaxAltitude() / 2);
 
     glUseProgram(ProgramId);
     //	Instantierea variabilelor uniforme pentru a "comunica" cu shaderele;
@@ -361,7 +366,7 @@ void RenderFunction() {
     view = camera.GetViewMatrix();
     projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
     model = glm::mat4(1.0f);
-    terrain.TerrainRender(view, projection, model);
+    terrain.TerrainRender(view, projection, model, gametime);
 
     glUseProgram(ProgramId);
     glBindVertexArray(VaoId);
@@ -399,7 +404,7 @@ void RenderFunction() {
     // Matricea de vizualizare si proiectie;
     view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
     projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
-    sky.SkyRender(view, projection,gametime);
+    sky.SkyRender(view, projection, gametime);
 
     glutSwapBuffers();    //	Inlocuieste imaginea deseneata in fereastra cu cea randata;
     glFlush();            //  Asigura rularea tuturor comenzilor OpenGL apelate anterior;
