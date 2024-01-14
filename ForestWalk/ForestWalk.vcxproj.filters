@@ -111,6 +111,9 @@
     <ClCompile Include="Skybox\skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Terrain\terrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SOIL.h">
@@ -1010,6 +1013,9 @@
     <ClInclude Include="Skybox\skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Terrain\terrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="include\glm\CMakeLists.txt">
@@ -1496,5 +1502,7 @@
     <None Include="textures\skybox\front.jpg" />
     <None Include="textures\skybox\top.jpg" />
     <None Include="textures\skybox\bottom.jpg" />
+    <None Include="shaders\terrain.frag" />
+    <None Include="shaders\terrain.vert" />
   </ItemGroup>
 </Project>
