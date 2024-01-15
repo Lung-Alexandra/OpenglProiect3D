@@ -49,7 +49,7 @@ public:
 	void DestroyTerrainShader();
 	void DestroyTerrainVBO();
 
-	float GetWorldScale() { return WORLD_SCALE; }
+	float GetWorldScale() const { return WORLD_SCALE; }
 	void SetWorldScale(float scale) { WORLD_SCALE = scale; }
 
 	float GetAltitudeFactor() { return altitude_factor; }
@@ -59,7 +59,7 @@ public:
 	void SetLightPos(glm::vec3 pos) { lightPos = pos * WORLD_SCALE; }
 
 	float GetMinAltitude() { return MIN_ALTITUDE; }
-	float GetMaxAltitude() { return MAX_ALTITUDE; }
+	float GetMaxAltitude() const { return MAX_ALTITUDE; }
 
 	glm::vec3 GetLightPos() { return lightPos; }
 	void SetLightPos(glm::vec3 pos) { lightPos = pos * WORLD_SCALE; }

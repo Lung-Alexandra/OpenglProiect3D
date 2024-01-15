@@ -17,7 +17,7 @@ private:
     const Terrain& terrain;
 
     GLuint VboId, VaoId, VbCol, VbModelMat, EboId;
-    GLint viewLocation, projLocation, codColLocation;
+    GLint viewLocation, projLocation, codColLocation,modelLocation;
     GLint codCol;
     unsigned int cntLoadedTextures;
 
@@ -37,7 +37,7 @@ public:
     void ruinsInit();
     void CreateRuinsVBO();
     void DestroyRuinsVBO();
-    void render(glm::mat4 view, glm::mat4 projection, glm::mat4 model, float time);
+    void render(glm::mat4 view, glm::mat4 projection, float time);
 };
 
 

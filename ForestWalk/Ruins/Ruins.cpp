@@ -14,6 +14,7 @@ void Ruins::ruinsInit() {
     viewLocation = glGetUniformLocation(RuinsId, "view");
     projLocation = glGetUniformLocation(RuinsId, "projection");
     codColLocation = glGetUniformLocation(RuinsId, "codCol");
+    modelLocation = glGetUniformLocation(RuinsId, "model");
 
     cntLoadedTextures = LoadTextures(textureIDs, textures);
 }
@@ -110,20 +111,6 @@ void Ruins::CreateRuinsVBO()
           -size,  size, -size, 1.0f   // Vertex 23
     };
 
-
-    //	CULORILE instantelor;
-    //	Culorile sunt generate in functie de indexul de instatiere - fiecare cub va avea o singura culoare;
-    glm::vec4 Colors[INSTANCE_COUNT];
-    for (int i = 0; i < INSTANCE_COUNT; i++) {
-        float a = float(i) / 4.0f;
-        float b = float(i) / 5.0f;
-        float c = float(i) / 6.0f;
-        Colors[i][0] = 0.35f + 0.30f * (sinf(a + 2.0f) + 1.0f);
-        Colors[i][1] = 0.25f + 0.25f * (sinf(b + 3.0f) + 1.0f);
-        Colors[i][2] = 0.25f + 0.35f * (sinf(c + 4.0f) + 1.0f);
-        Colors[i][3] = 1.0f;
-    }
-
     //  MATRICELE instantelor - se defineste tiparul de desenare al cuburilor prin ROTIREA si TRANSLATIA cubului initial (INSTANCED RENDERING);
     glm::mat4 MatModel[INSTANCE_COUNT];
     float radius = 500.0f; // Radius for the circular arrangement
@@ -177,29 +164,25 @@ void Ruins::CreateRuinsVBO()
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
 
-
     GLfloat TexCoords[] = {
         // Bottom face 
-        1.0, 1.0,  0.0, 1.0,  0.0, 0.0,  1.0, 0.0,
+        0.0, 0.0,  1.0, 0.0,  1.0, 1.0,  0.0, 1.0,
 
         // Top face 
-        0.0, 0.0,  1.0, 0.0,  1.0, 1.0,  0.0, 1.0,
+        1.0, 1.0,  0.0, 1.0,  0.0, 0.0,  1.0, 0.0,
 
         // Front face 
-        0.0, 0.0,  1.0, 0.0,  1.0, 1.0,  0.0, 1.0,
+        1.0, 1.0,  0.0, 1.0,  0.0, 0.0,  1.0, 0.0,
 
         // Right face 
-        0.0, 1.0,  0.0, 0.0,  1.0, 0.0,  1.0, 1.0,
+        1.0, 0.0,  1.0, 1.0,  0.0, 1.0,  0.0, 0.0,
+
         // Back face 
-        0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0,
+        1.0, 0.0,  1.0, 1.0,  0.0, 1.0,  0.0, 0.0,
 
         // Left face
-
-         0.0, 0.0,  1.0, 0.0,  1.0, 1.0,  0.0, 1.0,
-
+        1.0, 1.0,  0.0, 1.0,  0.0, 0.0,  1.0, 0.0,
     };
-
-
 
 
     // Generate and bind buffer for texture coordinates
@@ -210,19 +193,153 @@ void Ruins::CreateRuinsVBO()
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0);
 
+   
+
+
+    GLfloat Normals[] = {
+         -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         -1.0f, -1.0f, -1.0f,
+         -1.0f, 1.0f, -1.0f,
+         1.0f, 1.0f, -1.0f,
+         1.0f, 1.0f, -1.0f,
+         -1.0f, 1.0f, -1.0f,
+         -1.0f, -1.0f, 1.0f,
+         1.0f, -1.0f, 1.0f,
+         1.0f, -1.0f, 1.0f,
+         -1.0f, -1.0f, 1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, 1.0f, -1.0f,
+         1.0f, 1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         -1.0f, -1.0f, -1.0f,
+         -1.0f, 1.0f, -1.0f,
+         -1.0f, 1.0f, -1.0f,
+         -1.0f, -1.0f, -1.0f,
+         -1.0f, -1.0f, 1.0f,
+         -1.0f, -1.0f, 1.0f,
+         -1.0f, 1.0f, 1.0f,
+         -1.0f, 1.0f, 1.0f
+    };
+
+    GLfloat Tangents[] = {
+        // Bottom Face (Vertices 0, 1, 2, 3)
+        1.0f, 0.0f, 0.0f, // Vertex 0
+        1.0f, 0.0f, 0.0f, // Vertex 1
+        1.0f, 0.0f, 0.0f, // Vertex 2
+        1.0f, 0.0f, 0.0f, // Vertex 3
+
+        // Top Face (Vertices 4, 5, 6, 7)
+        1.0f, 0.0f, 0.0f, // Vertex 4
+        1.0f, 0.0f, 0.0f, // Vertex 5
+        1.0f, 0.0f, 0.0f, // Vertex 6
+        1.0f, 0.0f, 0.0f, // Vertex 7
+
+        // Front Face (Vertices 8, 9, 10, 11)
+        1.0f, 0.0f, 0.0f, // Vertex 8
+        1.0f, 0.0f, 0.0f, // Vertex 9
+        1.0f, 0.0f, 0.0f, // Vertex 10
+        1.0f, 0.0f, 0.0f, // Vertex 11
+
+        // Right Face (Vertices 12, 13, 14, 15)
+        0.0f, 0.0f, -1.0f, // Vertex 12
+        0.0f, 0.0f, -1.0f, // Vertex 13
+        0.0f, 0.0f, -1.0f, // Vertex 14
+        0.0f, 0.0f, -1.0f, // Vertex 15
+
+        // Back Face (Vertices 16, 17, 18, 19)
+        -1.0f, 0.0f, 0.0f, // Vertex 16
+        -1.0f, 0.0f, 0.0f, // Vertex 17
+        -1.0f, 0.0f, 0.0f, // Vertex 18
+        -1.0f, 0.0f, 0.0f, // Vertex 19
+
+        // Left Face (Vertices 20, 21, 22, 23)
+        0.0f, 0.0f, 1.0f, // Vertex 20
+        0.0f, 0.0f, 1.0f, // Vertex 21
+        0.0f, 0.0f, 1.0f, // Vertex 22
+        0.0f, 0.0f, 1.0f, // Vertex 23
+    };
+
+    GLfloat Bitangents[] = {
+        // Bottom Face (Vertices 0, 1, 2, 3)
+        0.0f, 0.0f, 1.0f, // Vertex 0
+        0.0f, 0.0f, 1.0f, // Vertex 1
+        0.0f, 0.0f, 1.0f, // Vertex 2
+        0.0f, 0.0f, 1.0f, // Vertex 3
+
+        // Top Face (Vertices 4, 5, 6, 7)
+        0.0f, 0.0f, -1.0f, // Vertex 4
+        0.0f, 0.0f, -1.0f, // Vertex 5
+        0.0f, 0.0f, -1.0f, // Vertex 6
+        0.0f, 0.0f, -1.0f, // Vertex 7
+
+        // Front Face (Vertices 8, 9, 10, 11)
+        0.0f, 1.0f, 0.0f, // Vertex 8
+        0.0f, 1.0f, 0.0f, // Vertex 9
+        0.0f, 1.0f, 0.0f, // Vertex 10
+        0.0f, 1.0f, 0.0f, // Vertex 11
+
+        // Right Face (Vertices 12, 13, 14, 
+
+        0.0f, 1.0f, 0.0f, // Vertex 12
+        0.0f, 1.0f, 0.0f, // Vertex 13
+        0.0f, 1.0f, 0.0f, // Vertex 14
+        0.0f, 1.0f, 0.0f, // Vertex 15
+
+        // Back Face (Vertices 16, 17, 18, 19)
+        0.0f, 1.0f, 0.0f, // Vertex 16
+        0.0f, 1.0f, 0.0f, // Vertex 17
+        0.0f, 1.0f, 0.0f, // Vertex 18
+        0.0f, 1.0f, 0.0f, // Vertex 19
+
+        // Left Face (Vertices 20, 21, 22, 23)
+        0.0f, 1.0f, 0.0f, // Vertex 20
+        0.0f, 1.0f, 0.0f, // Vertex 21
+        0.0f, 1.0f, 0.0f, // Vertex 22
+        0.0f, 1.0f, 0.0f // Vertex 23
+    };
+
+    GLuint VbNormals;
+    glGenBuffers(1, &VbNormals);
+    glBindBuffer(GL_ARRAY_BUFFER, VbNormals);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Normals), Normals, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+
+    
+
+    GLuint VbTangents;
+    glGenBuffers(1, &VbTangents);
+    glBindBuffer(GL_ARRAY_BUFFER, VbTangents);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Tangents), Tangents, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+
+    
+
+    GLuint VbBiTangents;
+    glGenBuffers(1, &VbBiTangents);
+    glBindBuffer(GL_ARRAY_BUFFER, VbBiTangents);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Bitangents), Bitangents, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+
 
     glGenBuffers(1, &VbModelMat);
     glBindBuffer(GL_ARRAY_BUFFER, VbModelMat);
     glBufferData(GL_ARRAY_BUFFER, sizeof(MatModel), MatModel, GL_STATIC_DRAW);
+
     //	Se activeaza lucrul cu atribute pentru fiecare coloana din fiecare matrice de instantiere;
     //	Se incepe de la primul indice de atribut disponibil (2) si se creeaza pe rand cate unul pentru fiecare coloana (2+i, unde i = 0..3);
+    const int prevBuff = 5;
     for (int i = 0; i < 4; i++) {
-        glEnableVertexAttribArray(2 + i);
-        glVertexAttribPointer(2 + i,              //  Location;
+        glEnableVertexAttribArray(prevBuff + i);
+        glVertexAttribPointer(prevBuff + i,              //  Location;
             4, GL_FLOAT, GL_FALSE,                //  vec4;
             sizeof(glm::mat4),                    //  Stride;
             (void*)(sizeof(glm::vec4) * i));      //  Start offset;
-        glVertexAttribDivisor(2 + i, 1);
+        glVertexAttribDivisor(prevBuff + i, 1);
     }
 
     
@@ -250,19 +367,28 @@ void Ruins::DestroyRuinsVBO() {
     glBindVertexArray(0);
     glDeleteVertexArrays(1, &VaoId);
 }
-void Ruins::render(glm::mat4 view, glm::mat4 projection, glm::mat4 model, float time)
+static float terrain_width = 1023, terrain_depth = 1023;
+
+void Ruins::render(glm::mat4 view, glm::mat4 projection, float time)
 {
+    glm::mat4 model;
+    glm::vec3 relModel = terrain.GetWorldScale() * glm::vec3(0,10,-250) ;
+    model = glm::translate(glm::mat4(1.0f), relModel + glm::vec3(terrain.GetWorldScale() * terrain_width / 2,
+        0,
+        terrain.GetWorldScale() * terrain_depth / 2));
+
+
     glUseProgram(RuinsId);
     glBindVertexArray(VaoId);
     glBindBuffer(GL_ARRAY_BUFFER, VboId);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EboId);
 
-    // Matricea de vizualizare;
-    //view = camera.GetViewMatrix();
     glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &view[0][0]);
 
     //	Realizarea proiectiei;
     glUniformMatrix4fv(projLocation, 1, GL_FALSE, &projection[0][0]);
+    glUniformMatrix4fv(modelLocation, 1, GL_FALSE, &model[0][0]);
+
 
     glUniform1f(glGetUniformLocation(RuinsId, "gametime"), time);
     glUniform3fv(glGetUniformLocation(RuinsId, "LightPos"), 1, &terrain.lightPos[0]);
@@ -272,7 +398,6 @@ void Ruins::render(glm::mat4 view, glm::mat4 projection, glm::mat4 model, float 
         glBindTexture(GL_TEXTURE_2D, textureIDs[i]);
         glUniform1i(glGetUniformLocation(RuinsId, ("ruinsTextures[" + std::to_string(i) + "]").c_str()), i);
     }
-
     codCol = 0;
     glUniform1i(codColLocation, codCol);
     glDrawElementsInstanced(GL_QUADS, 24, GL_UNSIGNED_BYTE, 0, INSTANCE_COUNT);

@@ -231,10 +231,10 @@ void Initialize() {
     sky.SkyInit();
     terrain.TerrainInit();
 
- /*   camera.SetPos(glm::vec3(terrain.GetWorldScale() * terrain_width / 2, 
+    camera.SetPos(glm::vec3(terrain.GetWorldScale() * terrain_width / 2, 
                             terrain.GetWorldScale() * terrain.GetMaxAltitude() / 2,
                             terrain.GetWorldScale() * terrain_depth / 2));
-    camera.SetAltitude(terrain.GetWorldScale() * terrain.GetMaxAltitude() / 2);*/
+    camera.SetAltitude(terrain.GetWorldScale() * terrain.GetMaxAltitude() / 2);
 
     ruins.ruinsInit();
 }
@@ -261,7 +261,7 @@ void RenderFunction() {
     projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
     model = glm::mat4(1.0f);
     terrain.TerrainRender(view, projection, model, gametime);
-    ruins.render(view, projection, model, gametime);
+    ruins.render(view, projection, gametime);
 
     // Desenare SKYBOX
     // Matricea de vizualizare si proiectie;
