@@ -8,25 +8,30 @@
 #include "loadShaders.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "../Terrain/terrain.h"
 #define INSTANCE_COUNT 10
 
 class Ruins {
     float const PI = 3.141592;
 private:
+    const Terrain& terrain;
+
     GLuint VboId, VaoId, VbCol, VbModelMat, EboId;
     GLint viewLocation, projLocation, codColLocation;
     GLint codCol;
     unsigned int cntLoadedTextures;
 
-    std::vector<GLuint> textureIDs = {0};
+    std::vector<GLuint> textureIDs = {0,1};
 
     std::vector<std::string> textures = {
-            "textures/ruins/stone-granite-2-TEX.png",
+            "textures/ruins/granite-wall1-tex.png",
+            "textures/ruins/granite-wall1-normal.png",
     };
 
     unsigned int LoadTextures(std::vector<GLuint>& textureIDs, const std::vector<std::string>& textures);
 
 public:
+    Ruins(const Terrain& terrain) : terrain(terrain) {};
     GLint RuinsId;
     void CreateRuinsShader();
     void ruinsInit();

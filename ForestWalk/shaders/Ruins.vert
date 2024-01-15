@@ -9,6 +9,7 @@ layout (location = 2) in mat4 modelMatrix;
 //  Variabile de iesire;
 out vec4 gl_Position;   //  Transmite pozitia actualizata spre programul principal;
 out vec2 TexCoord;
+out vec3 FragPos;
 
 
 //  Variabile uniforme;
@@ -19,5 +20,5 @@ void main(void)
 {
    gl_Position = projection*view*modelMatrix*in_Position;
    TexCoord = inTex;
-
+   FragPos = in_Position.rgb;
 }

@@ -35,7 +35,7 @@ float terrain_width = 1023, terrain_depth = 1023;
 Camera camera;
 Skybox sky;
 Terrain terrain;
-Ruins ruins;
+Ruins ruins(terrain);
 
 void ProcessNormalKeysUp(unsigned char key, int x, int y) {
     keys[key] = false;
@@ -260,7 +260,7 @@ void RenderFunction() {
     view = camera.GetViewMatrix();
     projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
     model = glm::mat4(1.0f);
-    //terrain.TerrainRender(view, projection, model, gametime);
+    terrain.TerrainRender(view, projection, model, gametime);
     ruins.render(view, projection, model, gametime);
 
     // Desenare SKYBOX

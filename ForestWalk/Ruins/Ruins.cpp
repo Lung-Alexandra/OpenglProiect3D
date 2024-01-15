@@ -70,16 +70,46 @@ static float randomRange(float min, float max) {
 void Ruins::CreateRuinsVBO()
 {
     //	COORDONATELE varfurilor;
+    GLfloat size = 50.0f;
+
     GLfloat Vertices[] = {
-        -50.0f, -50.0f, -50.0f, 1.0f,
-         50.0f, -50.0f, -50.0f, 1.0f,
-         50.0f,  50.0f, -50.0f, 1.0f,
-        -50.0f,  50.0f, -50.0f, 1.0f,
-        -50.0f, -50.0f,  50.0f, 1.0f,
-         50.0f, -50.0f,  50.0f, 1.0f,
-         50.0f,  50.0f,  50.0f, 1.0f,
-        -50.0f,  50.0f,  50.0f, 1.0f
+        // Bottom face
+        -size, -size, -size, 1.0f,  // Vertex 0
+         size, -size, -size, 1.0f,  // Vertex 1
+         size, -size,  size, 1.0f,  // Vertex 2
+        -size, -size,  size, 1.0f,  // Vertex 3
+
+        // Top face
+        -size,  size, -size, 1.0f,  // Vertex 4
+         size,  size, -size, 1.0f,  // Vertex 5
+         size,  size,  size, 1.0f,  // Vertex 6
+        -size,  size,  size, 1.0f,  // Vertex 7
+
+        // Front face
+        -size, -size,  size, 1.0f,  // Vertex 8
+         size, -size,  size, 1.0f,  // Vertex 9
+         size,  size,  size, 1.0f,  // Vertex 10
+        -size,  size,  size, 1.0f,  // Vertex 11
+
+        // Right face
+         size, -size, -size, 1.0f,  // Vertex 12
+         size,  size, -size, 1.0f,  // Vertex 13
+         size,  size,  size, 1.0f,  // Vertex 14
+         size, -size,  size, 1.0f,  // Vertex 15
+
+         // Back face
+         -size, -size, -size, 1.0f,  // Vertex 16
+         -size,  size, -size, 1.0f,  // Vertex 17
+          size,  size, -size, 1.0f,  // Vertex 18
+          size, -size, -size, 1.0f,  // Vertex 19
+
+          // Left face
+          -size, -size, -size, 1.0f,  // Vertex 20
+          -size, -size,  size, 1.0f,  // Vertex 21
+          -size,  size,  size, 1.0f,  // Vertex 22
+          -size,  size, -size, 1.0f   // Vertex 23
     };
+
 
     //	CULORILE instantelor;
     //	Culorile sunt generate in functie de indexul de instatiere - fiecare cub va avea o singura culoare;
@@ -120,13 +150,14 @@ void Ruins::CreateRuinsVBO()
 
     //  Indicii pentru varfuri;
     GLubyte Indices[] = {
-        0, 2, 1, 0, 3, 2, // Bottom
-        4, 5, 6, 4, 6, 7, // Top
-        0, 1, 5, 0, 5, 4, // Front
-        1, 2, 6, 1, 6, 5, // Right
-        2, 3, 7, 2, 7, 6, // Back
-        3, 0, 4, 3, 4, 7  // Left
+         0, 1, 2, 3,     // Bottom face
+         4, 5, 6, 7,     // Top face
+         8, 9, 10, 11,   // Front face
+         12, 13, 14, 15, // Right face
+         16, 17, 18, 19, // Back face
+         20, 21, 22, 23 // Left face
     };
+
 
     //  Transmiterea datelor prin buffere;
 
@@ -134,7 +165,7 @@ void Ruins::CreateRuinsVBO()
     //  Generarea VAO si indexarea acestuia catre variabila VaoId;
     glGenVertexArrays(1, &VaoId);
     glBindVertexArray(VaoId);
-
+    
     //  Se creeaza un buffer pentru COORDONATE;
     //  Generarea bufferului si indexarea acestuia catre variabila VbPos;
     glGenBuffers(1, &VboId);
@@ -147,11 +178,29 @@ void Ruins::CreateRuinsVBO()
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
 
 
-    GLfloat TexCoords[] = { 0.0, 0.0, 2.0, 0.0, 2.0, 5.0, 0.0, 5.0, 
-    0.0, 0.0, 2.0, 0.0, 2.0, 5.0, 0.0, 5.0, 
-    0.0, 0.0, 2.0, 0.0, 2.0, 5.0, 0.0, 5.0, 
-    0.0, 0.0, 2.0, 0.0, 2.0, 5.0, 0.0, 5.0
+    GLfloat TexCoords[] = {
+        // Bottom face 
+        1.0, 1.0,  0.0, 1.0,  0.0, 0.0,  1.0, 0.0,
+
+        // Top face 
+        0.0, 0.0,  1.0, 0.0,  1.0, 1.0,  0.0, 1.0,
+
+        // Front face 
+        0.0, 0.0,  1.0, 0.0,  1.0, 1.0,  0.0, 1.0,
+
+        // Right face 
+        0.0, 1.0,  0.0, 0.0,  1.0, 0.0,  1.0, 1.0,
+        // Back face 
+        0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0,
+
+        // Left face
+
+         0.0, 0.0,  1.0, 0.0,  1.0, 1.0,  0.0, 1.0,
+
     };
+
+
+
 
     // Generate and bind buffer for texture coordinates
     GLuint VbTex;
@@ -215,6 +264,9 @@ void Ruins::render(glm::mat4 view, glm::mat4 projection, glm::mat4 model, float 
     //	Realizarea proiectiei;
     glUniformMatrix4fv(projLocation, 1, GL_FALSE, &projection[0][0]);
 
+    glUniform1f(glGetUniformLocation(RuinsId, "gametime"), time);
+    glUniform3fv(glGetUniformLocation(RuinsId, "LightPos"), 1, &terrain.lightPos[0]);
+
     for (GLuint i = 0; i < cntLoadedTextures; i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, textureIDs[i]);
@@ -223,6 +275,6 @@ void Ruins::render(glm::mat4 view, glm::mat4 projection, glm::mat4 model, float 
 
     codCol = 0;
     glUniform1i(codColLocation, codCol);
-    glDrawElementsInstanced(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_BYTE, 0, INSTANCE_COUNT); // 6 faces * 2 triangles each * 3 vertices
+    glDrawElementsInstanced(GL_QUADS, 24, GL_UNSIGNED_BYTE, 0, INSTANCE_COUNT);
 
 }
