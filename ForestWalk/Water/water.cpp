@@ -15,18 +15,15 @@ GLint
         modelLocationWater;
 int nr_puncte;
 
-void CreateWaterVBO() {
-//    float y = 100.0f;
-    float y = 300.0f;
-
+void CreateWaterVBO(int width,int wordFac) {
+    float y = 10.f;
     std::vector<GLfloat>Vertices;
     std::vector<GLuint>Indices;
-    int init = 15000;
-    int dim = 10000;
-    int pas = 100;
+    int dim = width*wordFac;
+    int pas = wordFac;
     int now =0;
-    for(int i=init;i<dim+init;i+=pas) {
-        for (int j = init; j < dim+init; j+=pas) {
+    for(int i=0;i<dim;i+=pas) {
+        for (int j = 0; j < dim; j+=pas) {
 
             Vertices.push_back(float(i));
             Vertices.push_back(float(y));

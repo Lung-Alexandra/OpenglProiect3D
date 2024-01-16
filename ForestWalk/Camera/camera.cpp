@@ -27,12 +27,12 @@ glm::mat4 Camera::GetViewMatrix() {
 }
 
 void Camera::increaseSpeed() {
-    MovementSpeed += 0.5;
+    MovementSpeed += 0.1;
 }
 
 void Camera::decreaseSpeed() {
-    if (MovementSpeed >= 0.5)
-        MovementSpeed -= 0.5;
+    if (MovementSpeed >= 0.1)
+        MovementSpeed -= 0.1;
 }
 
 // processes input received from any keyboard-like input system.
@@ -47,19 +47,19 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime) {
         Position += front * velocity;
     }
     if (direction == RFORWARD) {
-        Position += glm::normalize(front + Right) * velocity;
+        Position += glm::normalize(front + glm::normalize(Right)) * velocity;
     }
     if (direction == LFORWARD) {
-        Position += glm::normalize(front - Right) * velocity;
+        Position += glm::normalize(front - glm::normalize(Right)) * velocity;
     }
     if (direction == BACKWARD) {
         Position -= front * velocity;
     }
     if (direction == RBACKWARD) {
-        Position -= glm::normalize(front - Right) * velocity;
+        Position -= glm::normalize(front - glm::normalize(Right)) * velocity;
     }
     if (direction == LBACKWARD) {
-        Position -= glm::normalize(front + Right) * velocity;
+        Position -= glm::normalize(front + glm::normalize(Right)) * velocity;
     }
     if (direction == LEFT) {
         Position -= Right * velocity;

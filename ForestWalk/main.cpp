@@ -40,6 +40,7 @@ Terrain terrain;
 void ProcessNormalKeysUp(unsigned char key, int x, int y) {
     keys[key] = false;
 }
+
 void ProcessSpecialKeysUp(int key, int xx, int yy) {
     keys[key] = false;
 }
@@ -87,17 +88,17 @@ void ProcessNormalKeys(unsigned char key, int x, int y) {
         }
     }
     // coborare
-    if(keys['q']){
+    if (keys['q']) {
         camera.ProcessKeyboard(UP, gametime);
     }
     // urcare
-    if(keys['e']){
+    if (keys['e']) {
         camera.ProcessKeyboard(DOWN, gametime);
     }
-    if(key == '+'){
+    if (key == '+') {
         camera.increaseSpeed();
     }
-    if(key == '-'){
+    if (key == '-') {
         camera.decreaseSpeed();
     }
     if (key == 27) {
@@ -108,8 +109,7 @@ void ProcessNormalKeys(unsigned char key, int x, int y) {
     }
 }
 
-void ProcessSpecialKeys(int key, int xx, int yy)
-{
+void ProcessSpecialKeys(int key, int xx, int yy) {
     // 100-> GLUT_KEY_LEFT, 101-> GLUT_KEY_RIGHT, 102->GLUT_KEY_UP, 103->GLUT_KEY_DOWN
     ProcessNormalKeysDown(key, xx, yy);
     if (keys[GLUT_KEY_UP]) {
@@ -156,8 +156,8 @@ int centerX = winWidth / 2, centerY = winHeight / 2;
 
 void UseMouse(int x, int y) {
 
-    float xoffset = (float) x - (float)centerX;
-    float yoffset = (float)centerY - (float) y;
+    float xoffset = (float) x - (float) centerX;
+    float yoffset = (float) centerY - (float) y;
 
     camera.ProcessMouseMovement(xoffset, yoffset);
 
@@ -194,6 +194,7 @@ void Cleanup() {
     DestroyWaterVBO();
     DestroyShaders();
 }
+
 //  Setarea parametrilor necesari pentru fereastra de vizualizare;
 void Initialize() {
     glClearColor(1.f, 1.0f, 1.0f, 0.0f);        //  Culoarea de fond a ecranului;
@@ -202,24 +203,25 @@ void Initialize() {
 
     terrain.SetWorldScale(30.0f);
     terrain.CreateTerrainVBO(terrain_width, terrain_depth);
-    terrain.SetLightPos(glm::vec3(terrain_width / 2, 
-                                    terrain.GetMaxAltitude() * 2, 
-                                    terrain_depth / 2));
+    terrain.SetLightPos(glm::vec3(terrain_width / 2,
+                                  terrain.GetMaxAltitude() * 2,
+                                  terrain_depth / 2));
+    CreateWaterVBO((int)terrain.t_width , (int)terrain.GetWorldScale());
+
     CreateShaders();                            //  Initilizarea shaderelor;
 
     sky.SkyInit();
     terrain.TerrainInit();
+    WaterInit();
 
-    camera.SetPos(glm::vec3(terrain.GetWorldScale() * terrain_width / 2, 
+    camera.SetPos(glm::vec3(terrain.GetWorldScale() * terrain_width / 2,
                             terrain.GetWorldScale() * terrain.GetMaxAltitude() / 2,
                             terrain.GetWorldScale() * terrain_depth / 2));
     camera.SetAltitude(terrain.GetWorldScale() * terrain.GetMaxAltitude() / 2);
 
-    CreateWaterVBO();
-    WaterInit();
-
-    glPolygonMode(GL_FRONT, GL_LINE);
-    glPolygonMode(GL_BACK, GL_LINE);
+    glEnable( GL_BLEND );
+//    glPolygonMode(GL_FRONT, GL_LINE);
+//    glPolygonMode(GL_BACK, GL_LINE);
 
 }
 
@@ -237,23 +239,32 @@ void RenderFunction() {
     glEnable(GL_DEPTH_TEST);
 
     UpdateTime();
-
+    glEnable(GL_BLEND);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     view = camera.GetViewMatrix();
     projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
     model = glm::mat4(1.0f);
     WaterRender(view, projection, model, gametime);
+    glUniform3f(glGetUniformLocation(WaterId, "cameraPos"), camera.Position.x,camera.Position.y,camera.Position.z);
+    glUniform1i(glGetUniformLocation(WaterId, "skyboxday"), 0);
+    glUniform1i(glGetUniformLocation(WaterId, "skyboxnight"), 1);
+    glDisable(GL_BLEND);
+    glCullFace(GL_BACK);
 
     // Desenare TERRAIN
-//    view = camera.GetViewMatrix();
-//    projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
-//    model = glm::mat4(1.0f);
-//    terrain.TerrainRender(view, projection, model, gametime);
+    view = camera.GetViewMatrix();
+    projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
+    model = glm::mat4(1.0f);
+    terrain.TerrainRender(view, projection, model, gametime);
+    glDisable(GL_CULL_FACE);
 
     // Desenare SKYBOX
     // Matricea de vizualizare si proiectie;
-//    view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
-//    projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
-//    sky.SkyRender(view, projection, gametime);
+    view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
+    projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
+    sky.SkyRender(view, projection, gametime);
 
     glutSwapBuffers();    //	Inlocuieste imaginea deseneata in fereastra cu cea randata;
     glFlush();            //  Asigura rularea tuturor comenzilor OpenGL apelate anterior;

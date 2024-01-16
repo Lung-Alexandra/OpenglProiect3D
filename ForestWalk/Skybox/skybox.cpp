@@ -88,10 +88,10 @@ unsigned int Skybox::LoadCubemap(GLuint &textureID, std::vector<std::string> fac
     unsigned char *image;
 
     for (GLuint i = 0; i < faces.size(); i++) {
-        image = SOIL_load_image(faces[i].c_str(), &width, &height, &nrChanel, SOIL_LOAD_RGB);
+        image = SOIL_load_image(faces[i].c_str(), &width, &height, &nrChanel, SOIL_LOAD_RGBA);
         glTexImage2D(
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
-                GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image
+                GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image
         );
     }
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
