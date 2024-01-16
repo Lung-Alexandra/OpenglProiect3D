@@ -61,6 +61,9 @@ vec4 CalcTexColor()
        texColor = texture(terrainTextures[5], TexCoord);
     }
 
+    return texColor;
+}
+
 void main()
 {
     vec3 normal = normalize(Normal); 
