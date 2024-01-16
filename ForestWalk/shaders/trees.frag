@@ -1,4 +1,4 @@
-#version 330
+#version 330 core
 
 in vec2 TexCoord;
 in vec3 FragPos;
@@ -7,18 +7,32 @@ in vec3 rec_normal;
 
 out vec4 out_Color;
 
+uniform int codCol;
 uniform vec3 LightPos;
-uniform vec3 viewPos;
 uniform float gametime;
-uniform sampler2D treesTextures[2];
+uniform sampler2D treesTextures[4];
 
 void main(void)
 {
-    // Texture color
-    vec4 texColor = texture(treesTextures[0], TexCoord);
+	vec4 texColor;
+    vec3 normalMap;
 
-    // Normal map
-    vec3 normalMap = texture(treesTextures[0], TexCoord).rgb;
+    if (codCol == 0) {   
+        // Texture color
+        texColor = texture(treesTextures[0], TexCoord);
+
+        // Normal map
+        normalMap = texture(treesTextures[1], TexCoord).rgb;
+
+    }
+    else {
+		// Texture color
+		texColor = texture(treesTextures[2], TexCoord);
+
+		// Normal map
+		normalMap = texture(treesTextures[3], TexCoord).rgb;
+	}
+
     normalMap = vec3(0.0, 0.0, 1.0);
     normalMap = normalize(normalMap * 2.0 - 1.0); // Convert from [0, 1] to [-1, 1]
     vec3 normal = normalize(TBN * normalMap); // Transform to world space

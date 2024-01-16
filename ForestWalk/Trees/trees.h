@@ -9,7 +9,7 @@
 #include "SOIL.h"
 #include "../Terrain/terrain.h"
 
-#define INSTANCE_COUNT 10
+#define INSTANCE_COUNT 100
 
 class Trees {
 public:
@@ -34,14 +34,17 @@ private:
 	GLint
 		viewLocationTrees,
 		projLocationTrees,
-		modelLocationTrees;
+		modelLocationTrees,
+		codColLocationTrees;
 
 	unsigned int cntLoadedTextures;
-	std::vector<GLuint> textureIDs = { 0, 1 };
+	std::vector<GLuint> textureIDs = { 0, 1, 2, 3 };
 
 	std::vector<std::string> textures = {
 			"textures/trees/tree_bark.jpg",
+			"textures/trees/tree_bark_normal.jpg",
 			"textures/trees/tree_leaves.jpg",
+			"textures/trees/tree_leaves_normal.jpg",
 	};
 
 	Terrain& terrain;
