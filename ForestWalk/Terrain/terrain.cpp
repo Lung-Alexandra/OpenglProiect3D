@@ -53,7 +53,6 @@ void Terrain::CreateTerrainVBO(int width, int depth) {
 	}
 
 	// Initialize vertices
-	std::vector<Vertex> Vertices;
 	Vertices.resize(t_width * t_depth);
 
 	int idx = 0;
@@ -78,7 +77,6 @@ void Terrain::CreateTerrainVBO(int width, int depth) {
 	SOIL_free_image_data(h_image);
 
 	// Initialize indices
-	std::vector<GLuint> Indices;
 	Indices.resize((t_width - 1) * (t_depth - 1) * 6);
 
 	idx = 0;
