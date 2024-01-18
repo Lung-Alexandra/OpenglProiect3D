@@ -124,7 +124,7 @@ void Ruins::CreateRuinsVBO()
             radius * sin(angle) // Z position
         );
 
-        float verticalScale = randomRange(5.0f, 10.0f); // Increased vertical scale for stretching
+        float verticalScale = randomRange(5.0f, 10.0f) * 2; // Increased vertical scale for stretching
         glm::vec3 scale = glm::vec3(2.0f, verticalScale, 2.0f); // Scaling the cubes
 
         float rotation_angle = randomRange(-15.0f, 15.0f); // Slight random rotation
@@ -172,16 +172,16 @@ void Ruins::CreateRuinsVBO()
         1.0, 1.0,  0.0, 1.0,  0.0, 0.0,  1.0, 0.0,
 
         // Front face 
-        1.0, 1.0,  0.0, 1.0,  0.0, 0.0,  1.0, 0.0,
+       1.0f, 4.0f,  0.0f, 4.0f,  0.0f, 0.0f,  1.0f, 0.0f,
 
-        // Right face 
-        1.0, 0.0,  1.0, 1.0,  0.0, 1.0,  0.0, 0.0,
+       // Right face 
+       1.0f, 0.0f,  1.0f, 4.0f,  0.0f, 4.0f,  0.0f, 0.0f,
 
-        // Back face 
-        1.0, 0.0,  1.0, 1.0,  0.0, 1.0,  0.0, 0.0,
+       // Back face 
+       1.0f, 0.0f,  1.0f, 4.0f,  0.0f, 4.0f,  0.0f, 0.0f,
 
-        // Left face
-        1.0, 1.0,  0.0, 1.0,  0.0, 0.0,  1.0, 0.0,
+       // Left face
+       1.0f, 4.0f,  0.0f, 4.0f,  0.0f, 0.0f,  1.0f, 0.0f
     };
 
 
