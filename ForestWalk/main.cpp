@@ -14,29 +14,29 @@
 #include "Skybox/skybox.h"
 #include "Terrain/terrain.h"
 #include "Water/water.h"
+#include "Trees/trees.h"
+#include "Ruins/Ruins.h"
 
 //	Numarul de multiplicari 
-#define INSTANCE_COUNT 10
-
-//  Identificatorii obiectelor de tip OpenGL;
-GLint
-        ProgramId;
 GLint winWidth = 1200, winHeight = 900;
 //	Variabile catre matricile de transformare;
 glm::mat4 view, projection, model;
 //	Variabila ce determina schimbarea culorii pixelilor in shader;
-GLint codCol;
 //	Valaorea lui pi;
-float const PI = 3.141592;
 bool keys[256]; // 100->    GLUT_KEY_LEFT, 101-> GLUT_KEY_RIGHT, 102->GLUT_KEY_UP, 103->GLUT_KEY_DOWN
 //	Elemente pentru matricea de proiectie;
+float const PI = 3.141592;
+
 float width = 800, height = 600, zNear = 0.3f, fov = 90.f * PI / 180;
 float gametime = 0, delta_t = 0, last_time = 0;
 float terrain_width = 1023, terrain_depth = 1023;
+
 Camera camera;
 Skybox sky;
 Terrain terrain;
 Water water;
+Trees trees(terrain);
+Ruins ruins(terrain);
 
 void ProcessNormalKeysUp(unsigned char key, int x, int y) {
     keys[key] = false;
@@ -153,6 +153,8 @@ void ProcessSpecialKeys(int key, int xx, int yy) {
 }
 
 
+
+
 int centerX = winWidth / 2, centerY = winHeight / 2;
 
 void UseMouse(int x, int y) {
@@ -171,18 +173,23 @@ void UseMouse(int x, int y) {
 //	Trebuie sa fie in acelasi director cu proiectul actual;
 //  Shaderul de varfuri / vertex shader - afecteaza geometria scenei;
 //  Shaderul de fragment / Fragment shader - afecteaza culoarea pixelilor;
+
 void CreateShaders() {
     sky.CreateSkyShader();
     terrain.CreateTerrainShader();
     water.CreateWaterShader();
+    ruins.CreateRuinsShader();
+    terrain.CreateTerrainShader();
+    trees.CreateTreesShader();
 }
 
 // Elimina obiectele de tip shader dupa rulare;
 void DestroyShaders() {
-    glDeleteProgram(ProgramId);
+    glDeleteProgram(ruins.RuinsId);
     glDeleteProgram(sky.SkyboxId);
     glDeleteProgram(terrain.TerrainId);
     glDeleteProgram(water.WaterId);
+    glDeleteProgram(trees.TreesId);
 }
 
 //  Functia de eliberare a resurselor alocate de program;
@@ -193,6 +200,9 @@ void Cleanup() {
     terrain.DestroyTerrainVBO();
     water.DestroyWaterShader();
     water.DestroyWaterVBO();
+    trees.DestroyTreesShader();   
+    trees.DestroyTreesVBO();
+    ruins.DestroyRuinsVBO();
     DestroyShaders();
 }
 
@@ -201,18 +211,25 @@ void Initialize() {
     glClearColor(1.f, 1.0f, 1.0f, 0.0f);        //  Culoarea de fond a ecranului;
 
     sky.CreateSkyboxVBO();
-
+    ruins.CreateRuinsVBO();
     terrain.SetWorldScale(30.0f);
     terrain.CreateTerrainVBO(terrain_width, terrain_depth);
+
     terrain.SetLightPos(glm::vec3(terrain_width / 2,
                                   terrain.GetMaxAltitude() * 2,
                                   terrain_depth / 2));
     water.CreateWaterVBO((int)terrain.t_width , (int)terrain.GetWorldScale());
 
+    // sent without world scale to access the height of the terrain
+    trees.CreateTreesVBO(terrain_width, terrain_depth);
+
+
     CreateShaders();                            //  Initilizarea shaderelor;
 
     sky.SkyInit();
     terrain.TerrainInit();
+    trees.TreesInit();
+    ruins.ruinsInit();
     water.WaterInit();
 
     camera.SetPos(glm::vec3(terrain.GetWorldScale() * terrain_width / 2,
@@ -233,6 +250,8 @@ void UpdateTime() {
     gametime += delta_t;
 }
 
+
+
 //	Functia de desenare a graficii pe ecran;
 void RenderFunction() {
     //  Se curata ecranul OpenGL pentru a fi desenat noul continut (bufferul de culoare & adancime);
@@ -247,8 +266,9 @@ void RenderFunction() {
     projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
     model = glm::mat4(1.0f);
 
-    terrain.TerrainRender(view, projection, model, gametime);
-
+    terrain.TerrainRender(view, projection, model, gametime);  
+    trees.TreesRender(view, projection, model, gametime);
+    ruins.render(view, projection, gametime);
     water.WaterRender(view, projection, model, gametime,camera.Position);
 
     // Desenare SKYBOX
