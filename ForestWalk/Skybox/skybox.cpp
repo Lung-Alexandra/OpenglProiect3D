@@ -126,10 +126,9 @@ void Skybox::SkyRender(glm::mat4 view, glm::mat4 projection, float time) {
     // Transmiterea matricei de proiectiei;
     glUniformMatrix4fv(projLocationSky, 1, GL_FALSE, &projection[0][0]);
     float rotate = Speed * time;
-    glm::mat4 rot = glm::rotate(glm::mat4(1.0f), rotate, glm::vec3(0.0, 1.0, 0.0));
-    glUniformMatrix4fv(rotLocationSky, 1, GL_FALSE, &rot[0][0]);
-
+    glUniform1f(glGetUniformLocation(SkyboxId, "angle"), rotate);
     glUniform1f(glGetUniformLocation(SkyboxId, "gametime"), time);
+
     glBindVertexArray(VaoSky);
 
     glActiveTexture(GL_TEXTURE0);

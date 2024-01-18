@@ -30,8 +30,7 @@ float noise(vec2 p){
 }
 
 vec3 getPointAt(vec2 xz){
-    float circular = gametime - int (gametime/33)*33;
-    float height = noise(xz/8000 * circular) + 100;
+    float height = noise(xz/8000 * gametime) + 100;
     return vec3(xz.x, height, xz.y);
 }
 
@@ -54,9 +53,4 @@ void main(void)
     vec4 poz = vec4(a_triangle, 1);
     gl_Position = projection*view*model*poz;
 
-//    vec4 low_blue = vec4(0.00, 0.291, 0.970, 0.2);
-//    vec4 high_blue = vec4(0.376, 0.560, 0.990, 1);
-//
-//
-//    FragColor = low_blue;
 }
