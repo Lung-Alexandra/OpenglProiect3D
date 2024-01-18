@@ -61,12 +61,17 @@ public:
 	float GetMinAltitude() { return MIN_ALTITUDE; }
 	float GetMaxAltitude() { return MAX_ALTITUDE; }
 
+	float GetHeight(int x, int z) { return Vertices[x + z * t_width].Position.y; }
+
 private:
 	struct Vertex {
 		glm::vec3 Position;
 		glm::vec2 TexCoords;
 		glm::vec3 Normal = glm::vec3(0.0f, 0.0f, 0.0f);
 	};
+
+	std::vector<Vertex> Vertices;
+	std::vector<GLuint> Indices;
 
 	float GetY(int x, int z, unsigned char* heightmap, int h_width, int h_height, int h_nrChannels);
 

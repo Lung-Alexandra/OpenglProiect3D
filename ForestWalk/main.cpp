@@ -13,6 +13,7 @@
 #include "Camera/camera.h"
 #include "Skybox/skybox.h"
 #include "Terrain/terrain.h"
+#include "Trees/trees.h"
 
 //	Numarul de multiplicari 
 #define INSTANCE_COUNT 10
@@ -43,6 +44,7 @@ float terrain_width = 1023, terrain_depth = 1023;
 Camera camera;
 Skybox sky;
 Terrain terrain;
+Trees trees(terrain);
 
 void ProcessNormalKeysUp(unsigned char key, int x, int y) {
     keys[key] = false;
@@ -182,6 +184,7 @@ void CreateShaders() {
     ProgramId = LoadShaders("shaders/example.vert", "shaders/example.frag");
     sky.CreateSkyShader();
     terrain.CreateTerrainShader();
+    trees.CreateTreesShader();
 }
 
 //  Se initializeaza un vertex Buffer Object (VBO) pentru tranferul datelor spre memoria placii grafice (spre shadere);
@@ -288,6 +291,7 @@ void DestroyShaders() {
     glDeleteProgram(ProgramId);
     glDeleteProgram(sky.SkyboxId);
     glDeleteProgram(terrain.TerrainId);
+    glDeleteProgram(trees.TreesId);
 }
 
 void DestroyVBO() {
@@ -313,9 +317,11 @@ void DestroyVBO() {
 void Cleanup() {
     sky.DestroySkyShader();
     terrain.DestroyTerrainShader();
+    trees.DestroyTreesShader();
     DestroyShaders();
     sky.DestroySkyboxVBO();
     terrain.DestroyTerrainVBO();
+    trees.DestroyTreesVBO();
     DestroyVBO();
 }
 
@@ -330,10 +336,15 @@ void Initialize() {
     terrain.SetLightPos(glm::vec3(terrain_width / 2, 
                                     terrain.GetMaxAltitude() * 2, 
                                     terrain_depth / 2));
+
+    // sent without world scale to access the height of the terrain
+    trees.CreateTreesVBO(terrain_width, terrain_depth);
+
     CreateShaders();                            //  Initilizarea shaderelor;
 
     sky.SkyInit();
     terrain.TerrainInit();
+    trees.TreesInit();
 
     camera.SetPos(glm::vec3(terrain.GetWorldScale() * terrain_width / 2, 
                             terrain.GetWorldScale() * terrain.GetMaxAltitude() / 2,
@@ -367,6 +378,12 @@ void RenderFunction() {
     projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
     model = glm::mat4(1.0f);
     terrain.TerrainRender(view, projection, model, gametime);
+    
+    view = camera.GetViewMatrix();
+    projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
+    model = glm::mat4(1.0f);
+
+    trees.TreesRender(view, projection, model, gametime);
 
     glUseProgram(ProgramId);
     glBindVertexArray(VaoId);
