@@ -1,21 +1,5 @@
-#include <vector>
-#include "GL/glew.h"
-#include "glm/glm.hpp"
-#include "loadShaders.h"
-
-
-GLuint
-        VboWater,
-        VaoWater,
-        EboWater,
-        WaterId;
-GLint
-        viewLocationWater,
-        projLocationWater,
-        modelLocationWater;
-int nr_puncte;
-
-void CreateWaterVBO(int width,int wordFac) {
+#include "water.h"
+void Water::CreateWaterVBO(int width,int wordFac) {
     float y = 10.f;
     std::vector<GLfloat>Vertices;
     std::vector<GLuint>Indices;
@@ -73,15 +57,15 @@ void CreateWaterVBO(int width,int wordFac) {
 
 }
 
-void CreateWaterShader() {
+void Water::CreateWaterShader() {
     WaterId = LoadShaders("shaders/water.vert", "shaders/water.frag");
 }
 
-void DestroyWaterShader() {
+void Water::DestroyWaterShader() {
     glDeleteProgram(WaterId);
 }
 
-void DestroyWaterVBO() {
+void Water::DestroyWaterVBO() {
     glDisableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -92,7 +76,7 @@ void DestroyWaterVBO() {
     glDeleteVertexArrays(1, &VaoWater);
 }
 
-void WaterInit() {
+void Water::WaterInit() {
     glUseProgram(WaterId);
 
     viewLocationWater = glGetUniformLocation(WaterId, "view");
@@ -100,16 +84,19 @@ void WaterInit() {
     modelLocationWater = glGetUniformLocation(WaterId, "model");
 }
 
-void WaterRender(glm::mat4 view, glm::mat4 projection, glm::mat4 model, float time) {
+void Water::WaterRender(glm::mat4 view, glm::mat4 projection, glm::mat4 model, float time, glm::vec3 camera) {
     glUseProgram(WaterId);
 
+    glUniform3f(glGetUniformLocation(WaterId, "cameraPos"), camera.x,camera.y,camera.z);
     glUniformMatrix4fv(viewLocationWater, 1, GL_FALSE, &view[0][0]);
     glUniformMatrix4fv(projLocationWater, 1, GL_FALSE, &projection[0][0]);
     glUniformMatrix4fv(modelLocationWater, 1, GL_FALSE, &model[0][0]);
+    glUniform1i(glGetUniformLocation(WaterId, "skyboxday"), 0);
+    glUniform1i(glGetUniformLocation(WaterId, "skyboxnight"), 1);
+    glUniform1f(glGetUniformLocation(WaterId, "gametime"), time);
 
     glBindVertexArray(VaoWater);
 
-    glUniform1f(glGetUniformLocation(WaterId, "gametime"), time);
 
     glDrawElements(GL_TRIANGLES, nr_puncte, GL_UNSIGNED_INT, 0);
 

@@ -13,7 +13,7 @@
 #include "Camera/camera.h"
 #include "Skybox/skybox.h"
 #include "Terrain/terrain.h"
-#include "Water/water.cpp"
+#include "Water/water.h"
 
 //	Numarul de multiplicari 
 #define INSTANCE_COUNT 10
@@ -36,6 +36,7 @@ float terrain_width = 1023, terrain_depth = 1023;
 Camera camera;
 Skybox sky;
 Terrain terrain;
+Water water;
 
 void ProcessNormalKeysUp(unsigned char key, int x, int y) {
     keys[key] = false;
@@ -173,7 +174,7 @@ void UseMouse(int x, int y) {
 void CreateShaders() {
     sky.CreateSkyShader();
     terrain.CreateTerrainShader();
-    CreateWaterShader();
+    water.CreateWaterShader();
 }
 
 // Elimina obiectele de tip shader dupa rulare;
@@ -181,7 +182,7 @@ void DestroyShaders() {
     glDeleteProgram(ProgramId);
     glDeleteProgram(sky.SkyboxId);
     glDeleteProgram(terrain.TerrainId);
-    glDeleteProgram(WaterId);
+    glDeleteProgram(water.WaterId);
 }
 
 //  Functia de eliberare a resurselor alocate de program;
@@ -190,8 +191,8 @@ void Cleanup() {
     terrain.DestroyTerrainShader();
     sky.DestroySkyboxVBO();
     terrain.DestroyTerrainVBO();
-    DestroyWaterShader();
-    DestroyWaterVBO();
+    water.DestroyWaterShader();
+    water.DestroyWaterVBO();
     DestroyShaders();
 }
 
@@ -206,13 +207,13 @@ void Initialize() {
     terrain.SetLightPos(glm::vec3(terrain_width / 2,
                                   terrain.GetMaxAltitude() * 2,
                                   terrain_depth / 2));
-    CreateWaterVBO((int)terrain.t_width , (int)terrain.GetWorldScale());
+    water.CreateWaterVBO((int)terrain.t_width , (int)terrain.GetWorldScale());
 
     CreateShaders();                            //  Initilizarea shaderelor;
 
     sky.SkyInit();
     terrain.TerrainInit();
-    WaterInit();
+    water.WaterInit();
 
     camera.SetPos(glm::vec3(terrain.GetWorldScale() * terrain_width / 2,
                             terrain.GetWorldScale() * terrain.GetMaxAltitude() / 2,
@@ -240,30 +241,19 @@ void RenderFunction() {
 
     UpdateTime();
     glEnable(GL_BLEND);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    view = camera.GetViewMatrix();
-    projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
-    model = glm::mat4(1.0f);
-    WaterRender(view, projection, model, gametime);
-    glUniform3f(glGetUniformLocation(WaterId, "cameraPos"), camera.Position.x,camera.Position.y,camera.Position.z);
-    glUniform1i(glGetUniformLocation(WaterId, "skyboxday"), 0);
-    glUniform1i(glGetUniformLocation(WaterId, "skyboxnight"), 1);
-    glDisable(GL_BLEND);
-    glCullFace(GL_BACK);
 
-    // Desenare TERRAIN
     view = camera.GetViewMatrix();
     projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
     model = glm::mat4(1.0f);
+
     terrain.TerrainRender(view, projection, model, gametime);
-    glDisable(GL_CULL_FACE);
+
+    water.WaterRender(view, projection, model, gametime,camera.Position);
 
     // Desenare SKYBOX
     // Matricea de vizualizare si proiectie;
-    view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
-    projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
+    view = glm::mat4(glm::mat3(view));
     sky.SkyRender(view, projection, gametime);
 
     glutSwapBuffers();    //	Inlocuieste imaginea deseneata in fereastra cu cea randata;

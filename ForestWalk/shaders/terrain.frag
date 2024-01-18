@@ -1,6 +1,6 @@
 #version 330 core
 
-layout (location = 0) out vec4 FragColor;
+out vec4 FragColor;
 
 in vec4 Color;
 in vec2 TexCoord;
@@ -74,8 +74,8 @@ void main()
     // Multiply the diffuse factor by the night darkness factor during the night
     diffuseFactor *= mix(nightDarknessFactor, 1.0, smoothstep(-0.5, 0.5, sin(gametime*0.09)));
 
-    vec4 dayAmbientLight = vec4(0.12f, 0.12f, 0.12f, 0.0f);
-    vec4 nightAmbientLight = vec4(0.04f, 0.04f, 0.04f, 0.0f);
+    vec4 dayAmbientLight = vec4(0.12f, 0.12f, 0.12f, 1.0f);
+    vec4 nightAmbientLight = vec4(0.04f, 0.04f, 0.04f, 1.0f);
     vec4 ambientLight = mix(nightAmbientLight, dayAmbientLight, smoothstep(-0.5, 0.5, sin(gametime*0.09)));
 
 	vec4 texColor = CalcTexColor();

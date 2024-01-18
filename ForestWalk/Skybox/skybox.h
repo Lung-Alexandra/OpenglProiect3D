@@ -20,8 +20,7 @@ public:
             textureDay,
             textureNight;
     GLint   viewLocationSky,
-            projLocationSky,
-            rotLocationSky;
+            projLocationSky;
     float Speed = 0.02f;
     float Size = 1;
     unsigned int cubemapTextureDay, cubemapTextureNight;

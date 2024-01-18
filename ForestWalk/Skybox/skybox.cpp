@@ -109,7 +109,6 @@ void Skybox::SkyInit() {
     //	Instantierea variabilelor uniforme pentru a "comunica" cu shaderele;
     viewLocationSky = glGetUniformLocation(SkyboxId, "view");
     projLocationSky = glGetUniformLocation(SkyboxId, "projection");
-    rotLocationSky = glGetUniformLocation(SkyboxId, "rotation");
 
     cubemapTextureDay = LoadCubemap(textureDay,day);
     cubemapTextureNight = LoadCubemap(textureNight,night);
