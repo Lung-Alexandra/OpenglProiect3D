@@ -13,13 +13,11 @@
 #include "Camera/camera.h"
 #include "Skybox/skybox.h"
 #include "Terrain/terrain.h"
+#include "Water/water.h"
 #include "Trees/trees.h"
 #include "Ruins/Ruins.h"
 
 //	Numarul de multiplicari 
-
-//  Identificatorii obiectelor de tip OpenGL; 
-
 GLint winWidth = 1200, winHeight = 900;
 //	Variabile catre matricile de transformare;
 glm::mat4 view, projection, model;
@@ -36,12 +34,14 @@ float terrain_width = 1023, terrain_depth = 1023;
 Camera camera;
 Skybox sky;
 Terrain terrain;
+Water water;
 Trees trees(terrain);
 Ruins ruins(terrain);
 
 void ProcessNormalKeysUp(unsigned char key, int x, int y) {
     keys[key] = false;
 }
+
 void ProcessSpecialKeysUp(int key, int xx, int yy) {
     keys[key] = false;
 }
@@ -89,17 +89,17 @@ void ProcessNormalKeys(unsigned char key, int x, int y) {
         }
     }
     // coborare
-    if(keys['q']){
+    if (keys['q']) {
         camera.ProcessKeyboard(UP, gametime);
     }
     // urcare
-    if(keys['e']){
+    if (keys['e']) {
         camera.ProcessKeyboard(DOWN, gametime);
     }
-    if(key == '+'){
+    if (key == '+') {
         camera.increaseSpeed();
     }
-    if(key == '-'){
+    if (key == '-') {
         camera.decreaseSpeed();
     }
     if (key == 27) {
@@ -110,8 +110,7 @@ void ProcessNormalKeys(unsigned char key, int x, int y) {
     }
 }
 
-void ProcessSpecialKeys(int key, int xx, int yy)
-{
+void ProcessSpecialKeys(int key, int xx, int yy) {
     // 100-> GLUT_KEY_LEFT, 101-> GLUT_KEY_RIGHT, 102->GLUT_KEY_UP, 103->GLUT_KEY_DOWN
     ProcessNormalKeysDown(key, xx, yy);
     if (keys[GLUT_KEY_UP]) {
@@ -160,8 +159,8 @@ int centerX = winWidth / 2, centerY = winHeight / 2;
 
 void UseMouse(int x, int y) {
 
-    float xoffset = (float) x - (float)centerX;
-    float yoffset = (float)centerY - (float) y;
+    float xoffset = (float) x - (float) centerX;
+    float yoffset = (float) centerY - (float) y;
 
     camera.ProcessMouseMovement(xoffset, yoffset);
 
@@ -170,28 +169,18 @@ void UseMouse(int x, int y) {
 
 }
 
-
 //  Crearea si compilarea obiectelor de tip shader;
 //	Trebuie sa fie in acelasi director cu proiectul actual;
 //  Shaderul de varfuri / vertex shader - afecteaza geometria scenei;
 //  Shaderul de fragment / Fragment shader - afecteaza culoarea pixelilor;
 
-
-
 void CreateShaders() {
-    ruins.CreateRuinsShader();
     sky.CreateSkyShader();
     terrain.CreateTerrainShader();
+    water.CreateWaterShader();
+    ruins.CreateRuinsShader();
+    terrain.CreateTerrainShader();
     trees.CreateTreesShader();
-}
-
-//  Se initializeaza un vertex Buffer Object (VBO) pentru tranferul datelor spre memoria placii grafice (spre shadere);
-//  In acesta se stocheaza date despre varfuri (coordonate, culori, indici, texturare etc.);
-
-
-
-void CreateVBO() {
-    //CreateVboPyramids();
 }
 
 // Elimina obiectele de tip shader dupa rulare;
@@ -199,55 +188,59 @@ void DestroyShaders() {
     glDeleteProgram(ruins.RuinsId);
     glDeleteProgram(sky.SkyboxId);
     glDeleteProgram(terrain.TerrainId);
+    glDeleteProgram(water.WaterId);
     glDeleteProgram(trees.TreesId);
 }
-
-void DestroyVBO() {
-   
-}
-
-
 
 //  Functia de eliberare a resurselor alocate de program;
 void Cleanup() {
     sky.DestroySkyShader();
     terrain.DestroyTerrainShader();
-    trees.DestroyTreesShader();
-    DestroyShaders();
     sky.DestroySkyboxVBO();
     terrain.DestroyTerrainVBO();
+    water.DestroyWaterShader();
+    water.DestroyWaterVBO();
+    trees.DestroyTreesShader();   
     trees.DestroyTreesVBO();
     ruins.DestroyRuinsVBO();
-    DestroyVBO();
+    DestroyShaders();
 }
 
 //  Setarea parametrilor necesari pentru fereastra de vizualizare;
 void Initialize() {
     glClearColor(1.f, 1.0f, 1.0f, 0.0f);        //  Culoarea de fond a ecranului;
-    CreateVBO();                                //  Trecerea datelor de randare spre bufferul folosit de shadere;
+
     sky.CreateSkyboxVBO();
     ruins.CreateRuinsVBO();
     terrain.SetWorldScale(30.0f);
     terrain.CreateTerrainVBO(terrain_width, terrain_depth);
-    terrain.SetLightPos(glm::vec3(terrain_width / 2, 
-                                    terrain.GetMaxAltitude() * 2, 
-                                    terrain_depth / 2));
+
+    terrain.SetLightPos(glm::vec3(terrain_width / 2,
+                                  terrain.GetMaxAltitude() * 2,
+                                  terrain_depth / 2));
+    water.CreateWaterVBO((int)terrain.t_width , (int)terrain.GetWorldScale());
 
     // sent without world scale to access the height of the terrain
     trees.CreateTreesVBO(terrain_width, terrain_depth);
+
 
     CreateShaders();                            //  Initilizarea shaderelor;
 
     sky.SkyInit();
     terrain.TerrainInit();
     trees.TreesInit();
+    ruins.ruinsInit();
+    water.WaterInit();
 
-    camera.SetPos(glm::vec3(terrain.GetWorldScale() * terrain_width / 2, 
+    camera.SetPos(glm::vec3(terrain.GetWorldScale() * terrain_width / 2,
                             terrain.GetWorldScale() * terrain.GetMaxAltitude() / 2,
                             terrain.GetWorldScale() * terrain_depth / 2));
     camera.SetAltitude(terrain.GetWorldScale() * terrain.GetMaxAltitude() / 2);
 
-    ruins.ruinsInit();
+    glEnable( GL_BLEND );
+//    glPolygonMode(GL_FRONT, GL_LINE);
+//    glPolygonMode(GL_BACK, GL_LINE);
+
 }
 
 void UpdateTime() {
@@ -266,24 +259,21 @@ void RenderFunction() {
     glEnable(GL_DEPTH_TEST);
 
     UpdateTime();
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // Desenare TERRAIN
-    view = camera.GetViewMatrix();
-    projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
-    model = glm::mat4(1.0f);
-    terrain.TerrainRender(view, projection, model, gametime);
-    
     view = camera.GetViewMatrix();
     projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
     model = glm::mat4(1.0f);
 
+    terrain.TerrainRender(view, projection, model, gametime);  
     trees.TreesRender(view, projection, model, gametime);
     ruins.render(view, projection, gametime);
+    water.WaterRender(view, projection, model, gametime,camera.Position);
 
     // Desenare SKYBOX
     // Matricea de vizualizare si proiectie;
-    view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
-    projection = glm::infinitePerspective(GLfloat(fov), GLfloat(width) / GLfloat(height), zNear);
+    view = glm::mat4(glm::mat3(view));
     sky.SkyRender(view, projection, gametime);
 
     glutSwapBuffers();    //	Inlocuieste imaginea deseneata in fereastra cu cea randata;
@@ -299,8 +289,8 @@ int main(int argc, char *argv[]) {
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
     glutInitWindowSize(winWidth, winHeight);                        //  Dimensiunea ferestrei;
     glutInitWindowPosition(100, 100);                                //  Pozitia initiala a ferestrei;
-    glutCreateWindow(
-            "Forest Walk - OpenGL project");        //	Creeaza fereastra de vizualizare, indicand numele acesteia;
+    glutCreateWindow("Forest Walk - OpenGL project");
+    //	Creeaza fereastra de vizualizare, indicand numele acesteia;
 
     //	Se initializeaza GLEW si se verifica suportul de extensii OpenGL modern disponibile pe sistemul gazda;
     //  Trebuie initializat inainte de desenare;

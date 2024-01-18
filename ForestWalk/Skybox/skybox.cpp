@@ -88,10 +88,10 @@ unsigned int Skybox::LoadCubemap(GLuint &textureID, std::vector<std::string> fac
     unsigned char *image;
 
     for (GLuint i = 0; i < faces.size(); i++) {
-        image = SOIL_load_image(faces[i].c_str(), &width, &height, &nrChanel, SOIL_LOAD_RGB);
+        image = SOIL_load_image(faces[i].c_str(), &width, &height, &nrChanel, SOIL_LOAD_RGBA);
         glTexImage2D(
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
-                GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image
+                GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image
         );
     }
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -109,7 +109,6 @@ void Skybox::SkyInit() {
     //	Instantierea variabilelor uniforme pentru a "comunica" cu shaderele;
     viewLocationSky = glGetUniformLocation(SkyboxId, "view");
     projLocationSky = glGetUniformLocation(SkyboxId, "projection");
-    rotLocationSky = glGetUniformLocation(SkyboxId, "rotation");
 
     cubemapTextureDay = LoadCubemap(textureDay,day);
     cubemapTextureNight = LoadCubemap(textureNight,night);
@@ -126,10 +125,9 @@ void Skybox::SkyRender(glm::mat4 view, glm::mat4 projection, float time) {
     // Transmiterea matricei de proiectiei;
     glUniformMatrix4fv(projLocationSky, 1, GL_FALSE, &projection[0][0]);
     float rotate = Speed * time;
-    glm::mat4 rot = glm::rotate(glm::mat4(1.0f), rotate, glm::vec3(0.0, 1.0, 0.0));
-    glUniformMatrix4fv(rotLocationSky, 1, GL_FALSE, &rot[0][0]);
-
+    glUniform1f(glGetUniformLocation(SkyboxId, "angle"), rotate);
     glUniform1f(glGetUniformLocation(SkyboxId, "gametime"), time);
+
     glBindVertexArray(VaoSky);
 
     glActiveTexture(GL_TEXTURE0);
