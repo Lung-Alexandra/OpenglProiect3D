@@ -16,15 +16,15 @@ unsigned int Trees::LoadTextures(std::vector<GLuint>& textureIDs, const std::vec
 		glBindTexture(GL_TEXTURE_2D, textureIDs[i]);
 
 		int width, height, nrChannels;
-		unsigned char* image = SOIL_load_image(textures[i].c_str(), &width, &height, &nrChannels, SOIL_LOAD_RGB);
+		unsigned char* image = SOIL_load_image(textures[i].c_str(), &width, &height, &nrChannels, SOIL_LOAD_RGBA);
 
 		if (image) {
 			glTexImage2D(
 				GL_TEXTURE_2D,
 				0,
-				GL_RGB,
+				GL_RGBA,
 				width, height, 0,
-				GL_RGB,
+				GL_RGBA,
 				GL_UNSIGNED_BYTE,
 				image
 			);
