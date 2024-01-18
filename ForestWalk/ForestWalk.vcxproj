@@ -184,6 +184,7 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClCompile Include="src\imageloader.cpp" />
     <ClCompile Include="src\loadShaders.cpp" />
     <ClCompile Include="Terrain\terrain.cpp" />
+    <ClCompile Include="Trees\trees.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera\camera.h" />
@@ -487,6 +488,7 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClInclude Include="Ruins\Ruins.h" />
     <ClInclude Include="Skybox\skybox.h" />
     <ClInclude Include="Terrain\terrain.h" />
+    <ClInclude Include="Trees\trees.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="include\glm\CMakeLists.txt" />
@@ -657,6 +659,8 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <None Include="shaders\skybox.vert" />
     <None Include="shaders\terrain.frag" />
     <None Include="shaders\terrain.vert" />
+	<None Include="shaders\trees.frag" />
+	<None Include="shaders\trees.vert" />
     <None Include="textures\skybox\right.jpg" />
     <None Include="textures\skybox\left.jpg" />
     <None Include="textures\skybox\back.jpg" />

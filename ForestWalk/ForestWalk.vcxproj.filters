@@ -114,6 +114,9 @@
     <ClCompile Include="Terrain\terrain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Trees\trees.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Ruins\Ruins.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1019,6 +1022,9 @@
     <ClInclude Include="Terrain\terrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Trees\trees.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Ruins\Ruins.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1510,6 +1516,8 @@
     <None Include="textures\skybox\bottom.jpg" />
     <None Include="shaders\terrain.frag" />
     <None Include="shaders\terrain.vert" />
+    <None Include="shaders\trees.frag" />
+    <None Include="shaders\trees.vert" />
     <None Include="shaders\Ruins.vert" />
     <None Include="shaders\Ruins.frag" />
   </ItemGroup>
