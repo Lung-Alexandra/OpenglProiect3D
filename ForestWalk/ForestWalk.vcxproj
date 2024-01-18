@@ -23,7 +23,7 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{0aa9c6d1-561f-4bed-8022-842f27720d18}</ProjectGuid>
     <RootNamespace>ForestWalk</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -185,6 +185,7 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClCompile Include="src\loadShaders.cpp" />
     <ClCompile Include="Terrain\terrain.cpp" />
     <ClCompile Include="Trees\trees.cpp" />
+    <ClCompile Include="Water\water.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera\camera.h" />
@@ -489,6 +490,7 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClInclude Include="Skybox\skybox.h" />
     <ClInclude Include="Terrain\terrain.h" />
     <ClInclude Include="Trees\trees.h" />
+    <ClInclude Include="Water\water.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="include\glm\CMakeLists.txt" />
@@ -659,8 +661,10 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <None Include="shaders\skybox.vert" />
     <None Include="shaders\terrain.frag" />
     <None Include="shaders\terrain.vert" />
-	<None Include="shaders\trees.frag" />
-	<None Include="shaders\trees.vert" />
+    <None Include="shaders\water.frag" />
+    <None Include="shaders\water.vert" />
+    <None Include="shaders\trees.frag" />
+    <None Include="shaders\trees.vert" />
     <None Include="textures\skybox\right.jpg" />
     <None Include="textures\skybox\left.jpg" />
     <None Include="textures\skybox\back.jpg" />
