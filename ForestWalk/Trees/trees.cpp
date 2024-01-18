@@ -1,6 +1,8 @@
 ﻿#include "trees.h"
 #include "SOIL.h"
 #include <iostream>
+#include <vector>
+#include <random>
 #include <stdlib.h> 
 #include <stdio.h>
 #include <GL/freeglut.h>    
@@ -53,8 +55,31 @@ unsigned int Trees::LoadTextures(std::vector<GLuint>& textureIDs, const std::vec
 	return textureIDs.size();
 }
 
-static int getRandomInt(int min, int max) {
-	return min + rand() % (max - min);
+std::pair<int, int> Trees::generateEmptyBox(int mapWidth, int mapDepth, int radius, std::vector<std::vector<bool>>& map) {
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<int> distributionX(1, mapWidth - 1);
+	std::uniform_int_distribution<int> distributionY(1, mapDepth - 1);
+
+	std::pair<int, int> coordinates;
+	float delta = terrain.GetWorldScale() * (terrain.GetMaxAltitude() - terrain.GetMinAltitude()) / 6;
+	float MIN_HEIGHT = terrain.GetMinAltitude() + 0.2 * delta;
+	float MAX_HEIGHT = terrain.GetMinAltitude() + 0.6 * delta;
+	float y = MIN_HEIGHT;
+
+	do {
+		coordinates = std::make_pair(distributionX(gen), distributionY(gen));
+		int x = coordinates.first * 2 * radius + radius;
+		int z = coordinates.second * 2 * radius + radius;
+		y = terrain.GetHeight(x, z);
+	} while (map[coordinates.first][coordinates.second] || (y < MIN_HEIGHT) || (y > MAX_HEIGHT));
+
+
+	map[coordinates.first][coordinates.second] = true;
+
+	coordinates.first = coordinates.first * 2 * radius + radius;
+	coordinates.second = coordinates.second * 2 * radius + radius;
+	return coordinates;
 }
 
 void Trees::CreateTreesVBO(float terrain_width, float terrain_depth) {
@@ -78,14 +103,18 @@ void Trees::CreateTreesVBO(float terrain_width, float terrain_depth) {
 	Vertices[6].Position = glm::vec3(0.0f, 800.0f, 0.0f);
 	Vertices[6].TexCoords = glm::vec2(0.5f, 1.0f);
 
-	srand(time(NULL));
+	int radius = 15, mw = int(terrain_width / (2 * radius)), md = int(terrain_depth / (2 * radius));
+	std::vector<std::vector<bool>> map(mw + 5, std::vector<bool>(md + 5, false));
 
 	glm::mat4 MatModel[INSTANCE_COUNT];
 	for (int i = 0; i < INSTANCE_COUNT; i++) {
 		int x_offset = terrain_width / 3.5;
 		int z_offset = terrain_depth / 3.5;
-		int x = getRandomInt(x_offset, (int)terrain_width - x_offset);
-		int z = getRandomInt(z_offset, (int)terrain_depth - z_offset);
+		std::pair<int, int> coordinates = generateEmptyBox(mw, md, radius, map);
+		int x = coordinates.first;
+		int z = coordinates.second;
+		// int x = getRandomInt(x_offset, (int)terrain_width - x_offset);
+		// int z = getRandomInt(z_offset, (int)terrain_depth - z_offset);
 		float y = terrain.GetHeight(x, z);
 		// std::cout << "Tree " << i << " at " << x << " " << y << " " << z << std::endl;
 		glm::vec3 pos = glm::vec3(x * terrain.GetWorldScale(), y, z * terrain.GetWorldScale());

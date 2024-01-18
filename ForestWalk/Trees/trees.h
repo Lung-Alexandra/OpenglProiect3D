@@ -9,7 +9,7 @@
 #include "SOIL.h"
 #include "../Terrain/terrain.h"
 
-#define INSTANCE_COUNT 100
+#define INSTANCE_COUNT 50
 
 class Trees {
 public:
@@ -48,6 +48,8 @@ private:
 	};
 
 	Terrain& terrain;
+
+	std::pair<int, int> generateEmptyBox(int mapWidth, int mapDepth, int radius, std::vector<std::vector<bool>>& map);
 
 	float const PI = 3.141592f;
 
