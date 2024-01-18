@@ -120,6 +120,9 @@
     <ClCompile Include="Ruins\Ruins.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Water\water.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SOIL.h">
@@ -1028,6 +1031,9 @@
     <ClInclude Include="Ruins\Ruins.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Water\water.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="include\glm\CMakeLists.txt">
@@ -1520,5 +1526,7 @@
     <None Include="shaders\trees.vert" />
     <None Include="shaders\Ruins.vert" />
     <None Include="shaders\Ruins.frag" />
+    <None Include="shaders\water.frag" />
+    <None Include="shaders\water.vert" />
   </ItemGroup>
 </Project>

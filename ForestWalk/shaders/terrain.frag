@@ -67,8 +67,15 @@ vec4 CalcTexColor()
 void main()
 {
     vec3 normal = normalize(Normal); 
+
     float diffuseFactor = dot(normal, normalize(LightPos - FragPos));
-    diffuseFactor = max(diffuseFactor, 0.3f);
+    if (diffuseFactor < 0.0f) {
+		diffuseFactor = 0.0f;
+    }
+    else {
+        diffuseFactor = max(diffuseFactor, 0.3f);
+    }
+    
     float nightDarknessFactor = 0.7f;
 
     // Multiply the diffuse factor by the night darkness factor during the night
@@ -80,5 +87,5 @@ void main()
 
 	vec4 texColor = CalcTexColor();
 
-	FragColor = ambientLight + Color * texColor * diffuseFactor;
+	FragColor = ambientLight + Color * texColor * (0.2 + diffuseFactor);
 }

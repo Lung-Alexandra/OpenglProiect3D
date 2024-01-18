@@ -14,7 +14,7 @@
 class Ruins {
     float const PI = 3.141592;
 private:
-    const Terrain& terrain;
+    Terrain& terrain;
 
     GLuint VboId, VaoId, VbCol, VbModelMat, EboId;
     GLint viewLocation, projLocation, codColLocation,modelLocation;
@@ -31,7 +31,7 @@ private:
     unsigned int LoadTextures(std::vector<GLuint>& textureIDs, const std::vector<std::string>& textures);
 
 public:
-    Ruins(const Terrain& terrain) : terrain(terrain) {};
+    Ruins(Terrain& terrain) : terrain(terrain) {};
     GLint RuinsId;
     void CreateRuinsShader();
     void ruinsInit();

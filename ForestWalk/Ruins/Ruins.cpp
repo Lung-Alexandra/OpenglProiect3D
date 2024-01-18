@@ -27,7 +27,7 @@ unsigned int Ruins::LoadTextures(std::vector<GLuint>& textureIDs, const std::vec
 
         int width, height, nrChannels;
         unsigned char* image = SOIL_load_image(textures[i].c_str(), &width, &height, &nrChannels, SOIL_LOAD_RGB);
-        std::cout << width << ' ' << height << std::endl;
+        // std::cout << width << ' ' << height << std::endl;
 
         if (image) {
             glTexImage2D(
@@ -120,8 +120,8 @@ void Ruins::CreateRuinsVBO()
         float angle = glm::radians(i * angleDiff);
         glm::vec3 pos = glm::vec3(
             radius * cos(angle), // X position
-            0,                  // Y position (ground level)
-            radius * sin(angle) // Z position
+            0,                   // Y position (ground level)
+            radius * sin(angle)  // Z position
         );
 
         float verticalScale = randomRange(5.0f, 10.0f) * 2; // Increased vertical scale for stretching
@@ -372,9 +372,9 @@ static float terrain_width = 1023, terrain_depth = 1023;
 void Ruins::render(glm::mat4 view, glm::mat4 projection, float time)
 {
     glm::mat4 model;
-    glm::vec3 relModel = terrain.GetWorldScale() * glm::vec3(0,10,-250) ;
+    glm::vec3 relModel = terrain.GetWorldScale() * glm::vec3(0, 0, -250) ;
     model = glm::translate(glm::mat4(1.0f), relModel + glm::vec3(terrain.GetWorldScale() * terrain_width / 2,
-        0,
+        terrain.GetHeight(terrain_width / 2, terrain_depth / 2),
         terrain.GetWorldScale() * terrain_depth / 2));
 
 
